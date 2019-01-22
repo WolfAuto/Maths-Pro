@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+# this is import the functionailty of the registration from another python file
 from register_backend import register1, register2
 title_font = ("Times New Roman", 50)  # Setting font for titles on the frames
 large_font = ("Times New Roman", 24)  # Setting fonts for main headings
@@ -122,13 +123,10 @@ class Register(tk.Frame):  # Creating a class that inheirts tk.Frame from tkinte
         # Runs the register function in the other python file
         button1.grid(row=7, column=9)
 
-        button2 = tk.Button(self, text="Check details")
-        button2.grid(row=7, column=0)
-
-        def register(self, controller, firstname, surname, age, school_class, var, var1):  # function used changing frames
-            # vaildation of all the personal deatils and these details being added into the record
-            if register1(firstname, surname, age, school_class, var, var1) == True:
-                controller.show_frame(Register2)  # switches to the next part of the registration
+    def register(self, controller, firstname, surname, age, school_class, var, var1):  # function used changing frames
+        # vaildation of all the personal deatils and these details being added into the record
+        if register1(firstname, surname, age, school_class, var, var1) == True:
+            controller.show_frame(Register2)  # switches to the next part of the registration
 
 
 class Register2(tk.Frame):
@@ -169,10 +167,10 @@ class Register2(tk.Frame):
         label_2 = tk.Label(self, text="Confirm Password", bg="grey")
         label_2.grid(row=3, column=0, pady=20)
 
-        password_confirm = tk.StringVar()  # Stores the actual password the user password again (used for comparison)
+        confirm_password = tk.StringVar()  # Stores the actual password the user password again (used for comparison)
 
         # Hides the user password when being typed in
-        entry_2 = tk.Entry(self, textvariable=password_confirm, show="*")
+        entry_2 = tk.Entry(self, textvariable=confirm_password, show="*")
         entry_2.grid(row=3, column=1)
 
         # Label for where the user enters their email address
@@ -186,13 +184,13 @@ class Register2(tk.Frame):
                              command=lambda: controller.show_frame(Register))
         button1.grid(row=5, column=0)
 
-        button2 = ttk.Button(self, text="Create Account", command=lambda: self.register(
-            username_entry.get(), password_entry.get(), password_confirm.get(), email_entry.get()))
+        button2 = ttk.Button(self, text="Create Account", command=lambda: self.register(controller,
+                                                                                        username_entry.get(), password_entry.get(), confirm_password.get(), email_entry.get()))
         button2.grid(row=6, column=2)
 
-        def register(self, controller, username, password, password_confirm, email):
-            if register2(username, password, password_confirm, email) == True:
-                controller.show_frame(Main_Menu)
+    def register(self, controller, username, password, password_confirm, email):
+        if register2(username, password, password_confirm, email) == True:
+            controller.show_frame(Main_Menu)
 
 
 class Main_Menu(tk.Frame):

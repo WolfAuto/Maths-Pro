@@ -1,6 +1,6 @@
 import sqlite3 as sql  # module for database connection
 from tkinter import messagebox  # module for error messages on the tkinter page
-
+import string
 with sql.connect("testing.db") as db:  # sets the connection to tbe database file
     global cursor  # makes the cursor a global variable for all parts of the program
     cursor = db.cursor()  # sets the cursor to allow sql statement execution
@@ -55,33 +55,46 @@ def username_check(username):  # function for username vaildation
 
 
 def password_check(password, password_confirm):  # function for password vaildation
-    if len(password) >= 8:  # checks whether the password length is 8 chracterslong
-        if not password.isalpha():  # checks for letters in the password
-            if not password.isalnum():  # checks for numbers or special characters in the password
-                if (len(set(string.ascii_uppercase).intersection(password)) > 0:  # checks for uppercase characters
-                    if password == password_confirm:  # ensures that the two password variables match
-                        return True
+    if password == password_confirm:
+        if len(password) >= 8:  # checks whether the password length is 8 chracterslong
+            if len(set(string.ascii_lowercase).intersection(password)) > 0:  # checks for letters in the password
+                # checks for numbers or special characters in the password
+                if (len(set(string.ascii_uppercase).intersection(password)) > 0):
+                    if (len(set(string.ascii_digit).intersection(password))) > 0:  # checks for uppercase characters
+                        if (len(set(string.ascii_punctuation).intersection(password))) > 0:
+                            if password == password_confirm:  # ensures that the two password variables match
+                                return True
+                            else:
+                                messagebox.showwarning(
+                                    "Password", "Passwords don't match re enter confirm password again")
+                                # tkinter error message
+                                return False
+                        else:
+                            messagebox.showwarning(
+                                "Password", "Password doesn't contain a special character")
+                            return False
                     else:
-                        messagebox.showwarning(
-                            "Password", "Passwords don't match re enter confirm password again")
                         # tkinter error message
+                        messagebox.showwarning(
+                            "Password", "Password don't contain digits character")
                         return False
                 else:
-                    # tkinter error message
-                    messagebox.showwarning("Password", "Password don't contain uppercase character")
+                    messagebox.showwarning(
+                        "Password", "Password don't contain any uppercase characters")  # tkinter error message
                     return False
             else:
                 messagebox.showwarning(
-                    "Password", "Password don't contain any numbers or special characters")  # tkinter error message
-                return False
+                    "Password", "Password don't contain any lowercase letters")  # tkinter error message
+            return False
         else:
             messagebox.showwarning(
-                "Password", "Password don't contain any letters characters")  # tkinter error message
+                "Password", "Password is not 8 characters long")  # tkinter error message
             return False
     else:
         messagebox.showwarning(
-            "Password", "Password is not 8 characters long")  # tkinter error message
+            "Password", "Password don't match")  # tkinter error message
         return False
+
 
 def email_check(email):  # function for email vaildation
     if email.find("@") == -1:  # checks for a @ sign
@@ -94,11 +107,11 @@ def email_check(email):  # function for email vaildation
         return True
 
 
-def register2(username, password, pasword_confirm, email):  # function for entering a record into accounts
+def register2(username, password, confirm_password, email):  # function for entering a record into accounts
     if username_check(username):  # checks whether a existing username with the username enter exists
-        if password_check(password, password_confirm):  # ensures the password passes all the vaildations
+        if password_check(password, confirm_password):  # ensures the password passes all the vaildations
             if email_check(email):  # ensures the email passes the vaildation
-                insert_account=(
+                insert_account = (
                     "INSERT INTO accounts (username, password, email) VALUES (? , ? , ?)")
                 # sql statement for inserting a record into accounts
                 # executes the sql statement

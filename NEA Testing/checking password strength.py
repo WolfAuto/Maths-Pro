@@ -1,8 +1,8 @@
 import string
 from tkinter import messagebox
 
- def length_check(password):
-     "Password must be at least 8 characters long"
+def length_check(password):
+    "Password must be at least 8 characters long"
     return len(password) >= 8
 
 def lowercase_check(password):

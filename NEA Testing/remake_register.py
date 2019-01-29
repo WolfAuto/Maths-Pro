@@ -5,16 +5,16 @@ with sql.connect("newfile.db") as db:  # sets the connection to tbe database fil
     global cursor  # makes the cursor a global variable for all parts of the program
     cursor = db.cursor()  # sets the cursor to allow sql statement execution
 
-create_student_table = ("""CREATE TABLE IF NOT EXISTS students(account_id INTEGER PRIMARY KEY,
-                        firstname VARCHAR(30) NOT NULL,
-                        surname VARCHAR(30) NOT NULL,  age INTEGER NOT NULL,
-                        class VARCHAR (3) NOT NULL, gender VARCHAR (30) NOT NULL,
+create_student_table = ("""CREATE TABLE IF NOT EXISTS Students(account_id INTEGER PRIMARY KEY,
+                        firstname VARCHAR(30),
+                        surname VARCHAR(30) ,  age INTEGER ,
+                        class VARCHAR (3), gender VARCHAR (30) ,
                          username VARCHAR(30),password VARCHAR(30), email VARCHAR(30))""")
 
-create_teacher_table = ("""CREATE TABLE IF NOT EXISTS teachers(account_id INTEGER PRIMARY KEY,
-                        firstname VARCHAR(30) NOT NULL,
-                        surname VARCHAR(30) NOT NULL,  age INTEGER NOT NULL,
-                        class VARCHAR (3) NOT NULL, gender VARCHAR (30) NOT NULL,
+create_teacher_table = ("""CREATE TABLE IF NOT EXISTS Teachers(account_id INTEGER PRIMARY KEY,
+                        firstname VARCHAR(30) ,
+                        surname VARCHAR(30) ,  age INTEGER ,
+                        class VARCHAR (3) , gender VARCHAR (30),
                          username VARCHAR(30), password VARCHAR(30), email VARCHAR(30))""")
 # Sql statment to create the table where the user information will be stored
 cursor.execute(create_student_table)  # executes the sql statement
@@ -25,41 +25,57 @@ db.commit()  # saves changes made to the sql file
 
 
 def register1(firstname, surname, age, school_class, var, var1):  # Function for registration
-    Age = int(age)  # ensures the age is a number
-    if var == 1:  # changing the var to a gender either male or female depending on value
-        gender = "Male"
-    elif var == 2:
-        gender = "Female"
-    if var1 == 1:  # changin the var1 to a school either student or teacher depending on value
-        insert_details = (
-            """INSERT INTO students(firstname, surname, age, class, gender)
-            VALUES(?, ?, ?, ?, ?)""")  # sql statement to insert a record into table students
-        cursor.execute(insert_details, [(firstname), (surname),
-                                        (Age), (school_class), (gender)])  # execution of sql statement
-    elif var1 == 2:
-        insert_details = (
-            """INSERT INTO teachers(firstname, surname, age, class, gender)
-            VALUES(?, ?, ?, ?, ?)""")  # sql statement to insert a record into table teacher
-        cursor.execute(insert_details, [(firstname), (surname),
-                                        (Age), (school_class), (gender)])  # execution of sql statement
-    print(firstname, surname, Age, school_class,
+    if firstname.isalpha() == True:
+        if surname.isalpha() == True:
+            if age != " " and age.isdigit() == True:
+                if var != 1 or var != 2:
+                    if var == 1:  # changing the var to a gender either male or female depending on value
+                        gender = "Male"
+                        if (var1 != 1) or (var1 != 2):
+                            print(firstname, surname, age, school_class, gender)
+                        else:
+                            messagebox.showwarning(
+                                "School", "Pleasee choose either Student or Teacher")
+                    elif var == 2:
+                        gender = "Female"
+                        if (var1 != 1) or (var1 != 2):
+                            return True
+                            print(firstname, surname, age, school_class, gender)
+                        else:
+                            messagebox.showwarning(
+                                "School", "Please choose either Student or Teacher")
+                else:
+                    messagebox.showwarning("Gender", "Gender option cannot be left blank")
+            else:
+                messagebox.showwarning("Age", "Please enter a number")
+        else:
+            messagebox.showwarning("Surname", "Please enter a proper surname")
+    else:
+        messagebox.showwarning("First Name", "Please enter a proper first name")
+    print(firstname, surname, age, school_class,
           gender)  # for testing purposes
     # db.commit()  # saves changes made to the database file
     return True  # this is to ensure the record has been made to move to the next part of the registration
 
 
 def username_check(username):  # function for username vaildation
-    # sql statement for checking existing users
-    existing_users = cursor.execute(
-        "SELECT * from student,teacher where username = ?", (username,))
-
-    checking = cursor.fetchall()  # stores the result of sql search
-    if checking:  # if a username matches the username typed it returns false
-        messagebox.showerror(
-            "Error", "That username has already been taken please try another username")  # tkinter error message
-        return False
+    # Checking the length of username is more than 6 charcters
+    if len(username) >= 6:
+        # sql statement for checking existing users
+        existing_users = cursor.execute(
+            "SELECT Students.username, Teachers.username from Students INNER JOIN Teachers USING(account_id)")
+        checking = cursor.fetchall()  # stores the result of sql search
+        if checking:  # if a username matches the username typed it returns false
+            # tkinter error message
+            messagebox.showerror(
+                "Username", "That username has already been taken please try another username")
+            return False
+        else:
+            return True
     else:
-        return True
+        messagebox.showerror(
+            "Username", "Username has to be 6 or more characters")
+        return False
 
 
 def password_check(password, password_confirm):  # function for password vaildation
@@ -70,8 +86,8 @@ def password_check(password, password_confirm):  # function for password vaildat
                 # checks for numbers or special characters in the password
                 if (len(set(string.ascii_uppercase).intersection(password)) > 0):
                     # checks for uppercase characters
-                    if (len(set(string.ascii_digit).intersection(password))) > 0:
-                        if (len(set(string.ascii_punctuation).intersection(password))) > 0:
+                    if (len(set(string.digits).intersection(password))) > 0:
+                        if (len(set(string.punctuation).intersection(password))) > 0:
                             if password == password_confirm:  # ensures that the two password variables match
                                 return True
                             else:
@@ -108,10 +124,15 @@ def password_check(password, password_confirm):  # function for password vaildat
 
 def email_check(email):  # function for email vaildation
     if email.find("@") == -1:  # checks for a @ sign
+        messagebox.showwarning("Email", "Email must contain a @ sign")
         return False
-    elif email.find(".") < (email.find("@") + 2):  # checks for a . and ensures that
+    # checks for a . and ensures that it is after the @
+    elif email.find(".") < (email.find("@") + 2):
+        messagebox.showwarning(
+            "Email", "Email must contain a . after the @ sign")
         return False
     elif email.find(" ") != -1:  # ensures there are no spaces
+        messagebox.showwarning("Email", "Email must not contain any spaces")
         return False
     else:
         return True
@@ -126,13 +147,13 @@ def register2(username, password, confirm_password, email, var1):
             if email_check(email):  # ensures the email passes the vaildation
                 if var1 == 1:
                     insert_student = (
-                        "INSERT INTO students(username,password,email) VALUES (?, ?, ?)")
+                        "INSERT INTO Students(username,password,email) VALUES (?, ?, ?)")
                     cursor.execute(insert_student, [
-                                   (username), (password), (email,)])
+                                   (username), (password), (email)])
                 elif var1 == 2:
                     insert_teacher = (
-                        "INSERT INTO teachers(username,password,email) VALUES (?, ?, ?)")
-                    cursor.execute(insert_student, [
+                        "INSERT INTO Teachers(username,password,email) VALUES (?, ?, ?)")
+                    cursor.execute(insert_teacher, [
                                    (username), (password), (email)])
 
                 db.commit()  # saves the changes to the database file

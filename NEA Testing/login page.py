@@ -87,6 +87,11 @@ class Main_Menu(tk.Frame):
 
         help_button.image = photo
 
+        logout_button = tk.Button(self, text="Log out",
+                                  command=lambda: controller.show_frame(Main_Menu))
+        logout_button.config(height=3, width=10, bg="blue", fg="white")
+        logout_button.place(x=1050, y=750)
+
         quit_button = tk.Button(self, text="Exit", command=lambda: quit(self))
         quit_button.config(fg="white", bg="blue", height=3, width=10)
         quit_button.place(x=1200, y=750)
@@ -100,8 +105,8 @@ class StudentArea(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         tk.Frame.config(self, bg="grey")
-        label = tk.Label(self, text="Student Area",
-                         bg="cyan",  font=title_font)
+        label = tk.Label(self, text="Student Area", font=title_font)
+        label.config(bg="blue", fg="white")
         label.pack(pady=10, padx=10, side="top", anchor="nw")
 
         teacher_button = tk.Button(self, text="Teacher Area",
@@ -146,7 +151,7 @@ class TeacherArea(tk.Frame):
         tk.Frame.__init__(self, parent)
         tk.Frame.config(self, bg="grey")
         label_text = tk.Label(self, text="Teacher Area", font=title_font)
-        label_text.config(bg="cyan", fg="white")
+        label_text.config(bg="blue", fg="white")
         label_text.pack(pady=10, padx=10, anchor="nw")
         info_text = tk.Label(
             self, text="Welcome Teacher please choose from the following", font=medium_font, bg="grey")

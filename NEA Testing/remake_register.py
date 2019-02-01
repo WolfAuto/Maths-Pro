@@ -24,38 +24,42 @@ cursor.execute(create_teacher_table)  # executes the sql statement
 db.commit()  # saves changes made to the sql file
 
 
-def register1(firstname, surname, age, school_class, var, var1):  # Function for registration
+def register1(firstname, surname, age, school_class, var, var1):# Function for registration
+    gender=""
     if firstname.isalpha() == True:
         if surname.isalpha() == True:
-            if age != " " and age.isdigit() == True:
-                if var != 1 or var != 2:
+            try:
+                age1=int(age)
+                if school_class.isalnum() == True:
                     if var == 1:  # changing the var to a gender either male or female depending on value
-                        gender = "Male"
-                        if (var1 != 1) or (var1 != 2):
-                            print(firstname, surname, age, school_class, gender)
-                        else:
-                            messagebox.showwarning(
-                                "School", "Pleasee choose either Student or Teacher")
-                    elif var == 2:
-                        gender = "Female"
-                        if (var1 != 1) or (var1 != 2):
-                            return True
-                            print(firstname, surname, age, school_class, gender)
+                        if (var1==1) or (var1==2):
+                            print(firstname, surname, age, school_class, var1)
+                            return "m"
                         else:
                             messagebox.showwarning(
                                 "School", "Please choose either Student or Teacher")
+                            return False
+                        
+                    elif var == 2:
+                        if (var1==1) or (var1==2):
+                            print(firstname, surname, age, school_class, var1)
+                            return "f"
+                        else:
+                            messagebox.showwarning(
+                                "School", "Please choose either Student or Teacher")
+                            return False
+                    else:
+                        messagebox.showwarning("Gender", "Gender option cannot be left blank")
+                        return False
                 else:
-                    messagebox.showwarning("Gender", "Gender option cannot be left blank")
-            else:
+                    messagebox.showwarning("Class", "Class option cannot be left blank")
+            except ValueError:
                 messagebox.showwarning("Age", "Please enter a number")
         else:
-            messagebox.showwarning("Surname", "Please enter a proper surname")
+            messagebox.showwarning("Surname", "Please enter a Proper Surname")
     else:
-        messagebox.showwarning("First Name", "Please enter a proper first name")
-    print(firstname, surname, age, school_class,
-          gender)  # for testing purposes
-    # db.commit()  # saves changes made to the database file
-    return True  # this is to ensure the record has been made to move to the next part of the registration
+        messagebox.showwarning("First Name", "Please enter a proper First Name")
+
 
 
 def username_check(username):  # function for username vaildation
@@ -67,13 +71,13 @@ def username_check(username):  # function for username vaildation
         checking = cursor.fetchall()  # stores the result of sql search
         if checking:  # if a username matches the username typed it returns false
             # tkinter error message
-            messagebox.showerror(
+            messagebox.showwarning(
                 "Username", "That username has already been taken please try another username")
             return False
         else:
             return True
     else:
-        messagebox.showerror(
+        messagebox.showwarning(
             "Username", "Username has to be 6 or more characters")
         return False
 
@@ -145,16 +149,16 @@ def register2(username, password, confirm_password, email, var1):
         # ensures the password passes all the vaildations
         if password_check(password, confirm_password):
             if email_check(email):  # ensures the email passes the vaildation
-                if var1 == 1:
-                    insert_student = (
-                        "INSERT INTO Students(username,password,email) VALUES (?, ?, ?)")
-                    cursor.execute(insert_student, [
-                                   (username), (password), (email)])
-                elif var1 == 2:
-                    insert_teacher = (
-                        "INSERT INTO Teachers(username,password,email) VALUES (?, ?, ?)")
-                    cursor.execute(insert_teacher, [
-                                   (username), (password), (email)])
+                if var1 == 1: # inserts one whole record into student table
+                    insert_student = ("INSERT INTO Students(firstname,surname,age,class,gender,username,password,email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+                    cursor.execute(insert_student, [(self.controller.shared_data["firstname"].get()), (self.controller.shared_data["surname"].get()),
+                                                    (self.controller.shared_data["age"].get()), (self.controller.shared_data["Class"].get()),
+                                                    (self.controller.shared_data["gender"].get()), (username), (password), (email)])
+                elif var1 == 2: # inserts one whole record into the teacher table
+                    insert_teacher = ("INSERT INTO Teachers(firstname,surname,age,class,gender,username,password,email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+                    cursor.execute(insert_teacher, [(self.controller.shared_data["firstname"].get()), (self.controller.shared_data["surname"].get()),
+                                                    (self.controller.shared_data["age"].get()), (self.controller.shared_data["Class"].get()),
+                                                    (self.controller.shared_data["gender"].get()), (username), (password), (email)])
 
                 db.commit()  # saves the changes to the database file
                 db.close()  # closes the connection to the database file

@@ -21,6 +21,7 @@ class MathsPro(tk.Tk):
                             "age": tk.StringVar(),        # to different frames
                             "Class": tk.StringVar(),
                             "var": tk.IntVar(),
+                            "gender": tk.StringVar(),
                             "var1": tk.IntVar(),
                             "username": tk.StringVar(),
                             "password": tk.StringVar(),
@@ -157,18 +158,22 @@ class Register(tk.Frame):  # Creating a class that inheirts tk.Frame from tkinte
         quit_button.place(x=1200, y=750)
         enter_details = tk.Button(self, text="Enter details",
                                   command=lambda: self.register(self.controller, self.controller.shared_data["firstname"].get(),
-                                                                self.controller.shared_data["surname"].get(), int(
-                                      self.controller.shared_data["age"].get()),
-                                      self.controller.shared_data["Class"].get(
-                                  ),
-                                      self.controller.shared_data["var"].get(
-                                  ),
-                                      self.controller.shared_data["var1"].get()))
+                                                                self.controller.shared_data["surname"].get(),
+                                                                self.controller.shared_data["age"].get(),
+                                                                self.controller.shared_data["Class"].get(),
+                                                                self.controller.shared_data["var"].get(),
+                                                                self.controller.shared_data["var1"].get()))
         enter_details.grid(row=7, column=9)
 
     def register(self, controller, firstname, surname, age, school_class, var, var1):  # function used changing frames
         # vaildation of all the personal deatils and these details being added into the record
-        if register1(firstname, surname, age, school_class, var, var1) == True:
+        if register1(firstname, surname, age, school_class, var, var1) == "m":
+            self.controller.shared_data["gender"] = "Male"
+            print(self.controller.shared_data["gender"])
+            controller.show_frame(Register2)
+        elif register1(firstname, surname, age, school_class, var, var1) == "f":
+            self.controller.shared_data["gender"] = "Female"
+            print(self.controller.shared_data["gender"])
             controller.show_frame(Register2)  # switches to the next part of the registration
 
 
@@ -227,7 +232,7 @@ class Register2(tk.Frame):
         # Creates the button with the image stored
         help_button = tk.Button(self, text="Help Button", image=photo)
         # Removes the border on the button
-        help_button.config(border="0")
+        help_button.config(border="0",  bg="grey")
         # Places the button in the bottom left corner
         help_button.place(x=0, y=730)
         # Sets the image of the button to be the photo

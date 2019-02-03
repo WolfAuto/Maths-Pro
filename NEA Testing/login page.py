@@ -1,7 +1,7 @@
-import sqlite3
 import tkinter as tk
 from tkinter import ttk
-
+from login_backend import login_in
+from tkinter import messagebox
 title_font = ("Times New Roman", 50)
 medium_font = ("Times New Roman", 26)
 
@@ -69,7 +69,8 @@ class Main_Menu(tk.Frame):
         entry_2 = tk.Entry(self, textvariable=password_entry)
         entry_2.pack()
 
-        button = ttk.Button(self, text="Login")
+        button = ttk.Button(self, text="Login", command=lambda: self.vaildate(
+            controller, username_entry.get(), password_entry.get()))
         button.pack()
 
         button1 = ttk.Button(self, text="Student Area",
@@ -86,19 +87,22 @@ class Main_Menu(tk.Frame):
         help_button.place(x=0, y=730)
 
         help_button.image = photo
-
-        logout_button = tk.Button(self, text="Log out",
-                                  command=lambda: controller.show_frame(Main_Menu))
-        logout_button.config(height=3, width=10, bg="blue", fg="white")
-        logout_button.place(x=1050, y=750)
-
         quit_button = tk.Button(self, text="Exit", command=lambda: quit(self))
         quit_button.config(fg="white", bg="blue", height=3, width=10)
         quit_button.place(x=1200, y=750)
 
-    def vaildate_account(self, controller, username, password):
-        if vaildate_account(username, password) == True:
-            pass
+        login_button = tk.Button(
+            self, text="Login", command=lambda: self.vaildate(controller, username_entry.get(), password_entry.get()))
+        login_button.config(bg="blue", fg="green")
+        login_button.place(x=400, y=300)
+
+    def vaildate(self, controller, username, password):
+        if login_in(username, password) == "S":
+            controller.show_frame(StudentArea)
+       if login_in(username, password) == "T":
+            controller.show_frame(TeacherArea)
+        else:
+            messagebox.showwarning("Account", "Account doesn't exist")
 
 
 class StudentArea(tk.Frame):

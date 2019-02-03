@@ -4,7 +4,11 @@ import string
 with sql.connect("newfile.db") as db:  # sets the connection to tbe database file
     global cursor  # makes the cursor a global variable for all parts of the program
     cursor = db.cursor()  # sets the cursor to allow sql statement execution
-
+shared_data = {"firstname": "blank",  # dictionary that stores the user register information
+               "surname": "blank",    # through using the controller we can pass these variables
+               "age": 0,        # to different frames
+               "Class": "blank",
+               "gender": "blank", }
 create_student_table = ("""CREATE TABLE IF NOT EXISTS Students(account_id INTEGER PRIMARY KEY,
                         firstname VARCHAR(30),
                         surname VARCHAR(30) ,  age INTEGER ,
@@ -24,26 +28,39 @@ cursor.execute(create_teacher_table)  # executes the sql statement
 db.commit()  # saves changes made to the sql file
 
 
-def register1(firstname, surname, age, school_class, var, var1):# Function for registration
-    gender=""
-    if firstname.isalpha() == True:
-        if surname.isalpha() == True:
+def register1(firstname, surname, age, school_class, var, var1):  # Function for registration
+    if firstname.isalpha() is True:
+        if surname.isalpha() is True:
             try:
-                age1=int(age)
-                if school_class.isalnum() == True:
+                age1 = int(age)
+                if school_class.isalnum() is True:
                     if var == 1:  # changing the var to a gender either male or female depending on value
-                        if (var1==1) or (var1==2):
+                        if (var1 == 1) or (var1 == 2):
                             print(firstname, surname, age, school_class, var1)
-                            return "m"
+                            shared_data["firstname"] = firstname
+                            shared_data["surname"] = surname
+                            shared_data["age"] = age1
+                            shared_data["gender"] = "Male"
+                            shared_data["Class"] = school_class
+                            for key, val in shared_data.items():
+                                print(key, "=>", val)
+                            return True
                         else:
                             messagebox.showwarning(
                                 "School", "Please choose either Student or Teacher")
                             return False
-                        
+
                     elif var == 2:
-                        if (var1==1) or (var1==2):
+                        if (var1 == 1) or (var1 == 2):
                             print(firstname, surname, age, school_class, var1)
-                            return "f"
+                            shared_data["firstname"] = firstname
+                            shared_data["surname"] = surname
+                            shared_data["age"] = age1
+                            shared_data["gender"] = "Female"
+                            shared_data["Class"] = school_class
+                            for key, val in shared_data.items():
+                                print(key, "=>", val)
+                            return True
                         else:
                             messagebox.showwarning(
                                 "School", "Please choose either Student or Teacher")
@@ -61,18 +78,14 @@ def register1(firstname, surname, age, school_class, var, var1):# Function for r
         messagebox.showwarning("First Name", "Please enter a proper First Name")
 
 
-
 def username_check(username):  # function for username vaildation
     # Checking the length of username is more than 6 charcters
     if len(username) >= 6:
         # sql statement for checking existing users
-        existing_users = cursor.execute(
+        cursor.execute(
             "SELECT Students.username, Teachers.username from Students INNER JOIN Teachers USING(account_id)")
         checking = cursor.fetchall()  # stores the result of sql search
         if checking:  # if a username matches the username typed it returns false
-            # tkinter error message
-            messagebox.showwarning(
-                "Username", "That username has already been taken please try another username")
             return False
         else:
             return True
@@ -149,16 +162,18 @@ def register2(username, password, confirm_password, email, var1):
         # ensures the password passes all the vaildations
         if password_check(password, confirm_password):
             if email_check(email):  # ensures the email passes the vaildation
-                if var1 == 1: # inserts one whole record into student table
-                    insert_student = ("INSERT INTO Students(firstname,surname,age,class,gender,username,password,email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-                    cursor.execute(insert_student, [(self.controller.shared_data["firstname"].get()), (self.controller.shared_data["surname"].get()),
-                                                    (self.controller.shared_data["age"].get()), (self.controller.shared_data["Class"].get()),
-                                                    (self.controller.shared_data["gender"].get()), (username), (password), (email)])
-                elif var1 == 2: # inserts one whole record into the teacher table
-                    insert_teacher = ("INSERT INTO Teachers(firstname,surname,age,class,gender,username,password,email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-                    cursor.execute(insert_teacher, [(self.controller.shared_data["firstname"].get()), (self.controller.shared_data["surname"].get()),
-                                                    (self.controller.shared_data["age"].get()), (self.controller.shared_data["Class"].get()),
-                                                    (self.controller.shared_data["gender"].get()), (username), (password), (email)])
+                if var1 == 1:  # inserts one whole record into student table
+                    insert_student = (
+                        "INSERT INTO Students(firstname,surname,age,class,gender,username,password,email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+                    cursor.execute(insert_student, [(shared_data["firstname"]), (shared_data["surname"]),
+                                                    (shared_data["age"]), (shared_data["Class"]),
+                                                    (shared_data["gender"]), (username), (password), (email)])
+                elif var1 == 2:  # inserts one whole record into the teacher table
+                    insert_teacher = (
+                        "INSERT INTO Teachers(firstname,surname,age,class,gender,username,password,email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+                    cursor.execute(insert_teacher, [(shared_data["firstname"]), (shared_data["surname"]),
+                                                    (shared_data["age"]), (shared_data["Class"]),
+                                                    (shared_data["gender"]), (username), (password), (email)])
 
                 db.commit()  # saves the changes to the database file
                 db.close()  # closes the connection to the database file

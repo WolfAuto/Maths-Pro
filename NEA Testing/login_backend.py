@@ -1,32 +1,41 @@
 import sqlite3 as sql
-with sql.connect("Maths_Pro.db") as db:
+from tkinter import messagebox
+with sql.connect("newfile.db") as db:
     global cursor
     cursor = db.cursor()
+    cursor1 = db.cursor()
 
 
-def vaildate_account(username, password):
-    find_user = ("SELECT * FROM personal_details WHERE username = ? AND password = ?")
-    cursor.execute(find_user, [(username), (password)])
-    checking = cursor.fetchall()
-    print("Working now checking results")
-    print(username)
-    print(password)
-    print(checking)
+def login_in(username, password):
+    if student_check(username, password) is True and teacher_check(username, password) is False:
+        return "S"
+    elif student_check(username, password) is False and teacher_check(username, password) is True:
+        return "T"
+    else:
+        messagebox.showwarning("Account")
 
-    if checking:
-        for i in checking:
-            print("Account Found")
+
+def student_check(username, password):
+    find_user = ("SELECT username,password FROM Students WHERE username = ?")
+    cursor.execute(find_user, [(username)])
+    checking = cursor.fetchone()
+    if checking is not None:
+        db_user, db_password = checking
+        if username == db_user and password == db_password:
             return True
-
     else:
         return False
 
 
-def student_teacher(username):
-    load_area = (
-        "SELECT accounts.username ,  personal_deatils.School FROM accounts INNER JOIN personal_details USING(account_id) WHERE username = ?  ")
-
-    cursor.execute(load_area, [(username), (school)])
-    checking = cursor.fetchall()
-    print("Checking whether user is a student or teacher")
-    print(school)
+def teacher_check(username, password):
+    find_user1 = ("SELECT username,password FROM Teachers WHERE username = ?")
+    cursor1.execute(find_user1, [(username)])
+    checking1 = cursor1.fetchone()
+    if checking1 is not None:
+        db_user1, db_password1 = checking1
+        if username == db_user1 and password == db_password1:
+            return True
+        else:
+            pass
+    else:
+        return False

@@ -1,9 +1,13 @@
 import sqlite3 as sql  # module for database connection
 from tkinter import messagebox  # module for error messages on the tkinter page
 import string
+import re
+from validate_email import validate_email
 with sql.connect("newfile.db") as db:  # sets the connection to tbe database file
     global cursor  # makes the cursor a global variable for all parts of the program
+    global cursor1
     cursor = db.cursor()  # sets the cursor to allow sql statement execution
+    cursor1 = db.cursor()
 shared_data = {"firstname": "blank",  # dictionary that stores the user register information
                "surname": "blank",    # through using the controller we can pass these variables
                "age": 0,        # to different frames
@@ -82,17 +86,22 @@ def username_check(username):  # function for username vaildation
     # Checking the length of username is more than 6 charcters
     if len(username) >= 6:
         # sql statement for checking existing users
-        cursor.execute(
-            "SELECT Students.username, Teachers.username from Students INNER JOIN Teachers USING(account_id)")
+        # Checks student database for username
+        fetchstudents = ("SELECT DISTINCT Students.username from Students WHERE username = ?")
+        # Checkes teacher databaase for username
+        fetchteachers = ("SELECT DISTINCT Teachers.username from Teachers WHERE username = ?")
+        cursor.execute(fetchstudents, [(username)])  # executes the above query on the student table
+        cursor1.execute(fetchteachers, [(username)])  # execute the above query on the teacher table
         checking = cursor.fetchall()  # stores the result of sql search
-        if checking:  # if a username matches the username typed it returns false
-            return False
+        checking1 = cursor1.fetchall()
+        if checking or checking1:
+            messagebox.showerror("Username", "That username has been taken please try another one")
         else:
             return True
+
     else:
         messagebox.showwarning(
             "Username", "Username has to be 6 or more characters")
-        return False
 
 
 def password_check(password, password_confirm):  # function for password vaildation
@@ -119,7 +128,7 @@ def password_check(password, password_confirm):  # function for password vaildat
                     else:
                         # tkinter error message
                         messagebox.showwarning(
-                            "Password", "Password don't contain digits character")
+                            "Password", "Password don't contain numbers")
                         return False
                 else:
                     messagebox.showwarning(
@@ -140,28 +149,21 @@ def password_check(password, password_confirm):  # function for password vaildat
 
 
 def email_check(email):  # function for email vaildation
-    if email.find("@") == -1:  # checks for a @ sign
-        messagebox.showwarning("Email", "Email must contain a @ sign")
-        return False
-    # checks for a . and ensures that it is after the @
-    elif email.find(".") < (email.find("@") + 2):
-        messagebox.showwarning(
-            "Email", "Email must contain a . after the @ sign")
-        return False
-    elif email.find(" ") != -1:  # ensures there are no spaces
-        messagebox.showwarning("Email", "Email must not contain any spaces")
-        return False
+    match = re.match(
+        '^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', email)
+
+    if match is None:
+        messagebox.showerror("Email", "Please enter a valid email address ")
     else:
         return True
 
 
-# function for entering a record into accounts
 def register2(username, password, confirm_password, email, var1):
     # checks whether a existing username with the username enter exists
     if username_check(username):
         # ensures the password passes all the vaildations
         if password_check(password, confirm_password):
-            if email_check(email):  # ensures the email passes the vaildation
+            if email_check1(email):  # ensures the email passes the vaildation
                 if var1 == 1:  # inserts one whole record into student table
                     insert_student = (
                         "INSERT INTO Students(firstname,surname,age,class,gender,username,password,email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
@@ -179,12 +181,8 @@ def register2(username, password, confirm_password, email, var1):
                 db.close()  # closes the connection to the database file
                 return True
             else:
-                messagebox.showwarning("Warning Email Address",
-                                       "Please enter a vaild email address")  # tkinter error message
                 return False
         else:
             return False
     else:
-        messagebox.showwarning(
-            "Warning Username", "That username is already taken please try another one")  # tkinter error message
         return False

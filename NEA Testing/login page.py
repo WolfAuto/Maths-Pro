@@ -52,26 +52,26 @@ class MathsPro(tk.Tk):  # Creating a class that inherits from tk.Tk
 class Main_Menu(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Maths Pro", bg="blue", font=title_font)
-        label.pack(pady=10, padx=10)
+        title_label = tk.Label(self, text="Maths Pro", bg="blue", font=title_font)
+        title_label.pack(pady=10, padx=10)
 
-        label_1 = tk.Label(self, text="Username")
-        label_1.pack()
+        username_label = tk.Label(self, text="Username")
+        username_label.pack()
 
         username_entry = tk.StringVar()
-        entry_1 = tk.Entry(self, textvariable=username_entry)
-        entry_1.pack()
+        username_box = tk.Entry(self, textvariable=username_entry)
+        username_box.pack()
 
-        label_2 = tk.Label(self, text="Password")
-        label_2.pack()
+        password_label = tk.Label(self, text="Password")
+        password_label.pack()
 
         password_entry = tk.StringVar()
-        entry_2 = tk.Entry(self, textvariable=password_entry)
-        entry_2.pack()
+        password_box = tk.Entry(self, textvariable=password_entry, show="*")
+        password_box.pack()
 
-        button = ttk.Button(self, text="Login", command=lambda: self.vaildate(
-            controller, username_entry.get(), password_entry.get()))
-        button.pack()
+        login_button = ttk.Button(self, text="Login", command=lambda: [self.vaildate(
+            controller, username_entry.get(), password_entry.get()), username_box.delete(0, tk.END), password_box.delete(0, tk.END)])
+        login_button.pack()
 
         button1 = ttk.Button(self, text="Student Area",
                              command=lambda: controller.show_frame(StudentArea))

@@ -99,7 +99,7 @@ class Main_Menu(tk.Frame):
     def vaildate(self, controller, username, password):
         if login_in(username, password) == "S":
             controller.show_frame(StudentArea)
-       if login_in(username, password) == "T":
+        elif login_in(username, password) == "T":
             controller.show_frame(TeacherArea)
         else:
             messagebox.showwarning("Account", "Account doesn't exist")
@@ -193,6 +193,28 @@ class TeacherArea(tk.Frame):
         quit_button = tk.Button(self, text="Exit", command=lambda: quit(self))
         quit_button.config(fg="white", bg="blue", height=3, width=10)
         quit_button.place(x=1200, y=750)
+
+
+class Help_Page(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        tk.Frame.config(self, bg="cyan")
+
+        label = tk.Label(self, text="Help Page", font=title_font)
+        label.config(bg="cyan")
+        label.pack(pady=10, padx=10, side="top", anchor="nw")
+
+        help_button1 = tk.Button(self, text="Help Button 1")
+
+        help_button2 = tk.Button(self, text="Help Button 2")
+
+        help_button3 = tk.Button(self, text="Help Button 3")
+
+        help_button4 = tk.Button(self, text="Help Button 4")
+
+        help_button5 = tk.Button(self, text="Help Button 5")
+
+        help_button6 = tk.Button(self, text="Help Button 6")
 
 
 root = MathsPro()  # this runs the Maths Pro class

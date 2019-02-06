@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 # this is import the functionailty of the registration from another python file
-# from register_backend import register1, register2
 from remake_register import register1, register2
 title_font = ("Times New Roman", 50)  # Setting font for titles on the frames
 large_font = ("Times New Roman", 24)  # Setting fonts for main headings
@@ -53,7 +52,7 @@ class MathsPro(tk.Tk):
         # This allows the frame to be displayed and streched
         frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Register)  # sets the first frame to be shown is a register page
+        self.show_frame(Register2)  # sets the first frame to be shown is a register page
 
     def show_frame(self, cont):  # method that takes in cont as a controller
 

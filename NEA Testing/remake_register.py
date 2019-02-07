@@ -5,6 +5,7 @@ import re
 import bcrypt
 import base64
 import hashlib
+from validate_email import validate_email
 with sql.connect("updatedfile.db") as db:  # sets the connection to tbe database file
     global cursor  # makes the cursor a global variable for all parts of the program
     global cursor1
@@ -153,9 +154,13 @@ def password_check(password, password_confirm):  # function for password vaildat
 def email_check(email):  # function for email vaildation
     match = re.match(
         '^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', email)
+    is_valid = validate_email(email, verify=True)
 
     if match is None:
         messagebox.showerror("Email", "Please enter a valid email address ")
+    if is_valid is not True:
+        messagebox.showerror(
+            "Email", "Email address doesn't exist please try another email address")
     else:
         return True
 

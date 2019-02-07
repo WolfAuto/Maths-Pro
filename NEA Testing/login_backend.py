@@ -1,6 +1,6 @@
 import sqlite3 as sql
 import bcrypt
-with sql.connect("newfile.db") as db:
+with sql.connect("updatedfile.db") as db:
     global cursor
     cursor = db.cursor()
     cursor1 = db.cursor()
@@ -33,7 +33,7 @@ def teacher_check(username, password):
     checking1 = cursor1.fetchone()
     if checking1 is not None:
         db_user1, db_password1 = checking1
-        if (username == db_user1) and (bcrypt.checkpw(password.encode("utf8"), db_password) is True):
+        if (username == db_user1) and (bcrypt.checkpw(password.encode("utf8"), db_password1) is True):
             return True
     else:
         return False

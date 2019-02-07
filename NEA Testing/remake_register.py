@@ -3,8 +3,6 @@ from tkinter import messagebox  # module for error messages on the tkinter page
 import string
 import re
 import bcrypt
-import base64
-import hashlib
 from validate_email import validate_email
 with sql.connect("updatedfile.db") as db:  # sets the connection to tbe database file
     global cursor  # makes the cursor a global variable for all parts of the program

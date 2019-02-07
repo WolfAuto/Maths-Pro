@@ -52,7 +52,7 @@ class MathsPro(tk.Tk):
         # This allows the frame to be displayed and streched
         frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Register2)  # sets the first frame to be shown is a register page
+        self.show_frame(Main_Menu)  # sets the first frame to be shown is a register page
 
     def show_frame(self, cont):  # method that takes in cont as a controller
 
@@ -302,6 +302,6 @@ class Main_Menu(tk.Frame):
 
 
 root = MathsPro()  # this runs the Maths Pro class
-root.geometry("1280x800")  # changes the size of the window
+root.geometry("1280x800+150-50")  # changes the size of the window
 root.resizable(width=False, height=False)  # Prevents the root size from being changed
 root.mainloop()  # As MathsPro inherited from tkinter this function can be moved

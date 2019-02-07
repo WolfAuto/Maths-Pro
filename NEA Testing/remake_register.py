@@ -2,8 +2,11 @@ import sqlite3 as sql  # module for database connection
 from tkinter import messagebox  # module for error messages on the tkinter page
 import string
 import re
+import bcrypt
+import base64
+import hashlib
 from validate_email import validate_email
-with sql.connect("newfile.db") as db:  # sets the connection to tbe database file
+with sql.connect("updatedfile.db") as db:  # sets the connection to tbe database file
     global cursor  # makes the cursor a global variable for all parts of the program
     global cursor1
     cursor = db.cursor()  # sets the cursor to allow sql statement execution
@@ -17,13 +20,13 @@ create_student_table = ("""CREATE TABLE IF NOT EXISTS Students(account_id INTEGE
                         firstname VARCHAR(30),
                         surname VARCHAR(30) ,  age INTEGER ,
                         class VARCHAR (3), gender VARCHAR (30) ,
-                         username VARCHAR(30),password VARCHAR(30), email VARCHAR(30))""")
+                         username VARCHAR(30),password VARCHAR(80), email VARCHAR(30))""")
 
 create_teacher_table = ("""CREATE TABLE IF NOT EXISTS Teachers(account_id INTEGER PRIMARY KEY,
                         firstname VARCHAR(30) ,
                         surname VARCHAR(30) ,  age INTEGER ,
                         class VARCHAR (3) , gender VARCHAR (30),
-                         username VARCHAR(30), password VARCHAR(30), email VARCHAR(30))""")
+                         username VARCHAR(30), password VARCHAR(80), email VARCHAR(30))""")
 # Sql statment to create the table where the user information will be stored
 cursor.execute(create_student_table)  # executes the sql statement
 
@@ -151,9 +154,13 @@ def password_check(password, password_confirm):  # function for password vaildat
 def email_check(email):  # function for email vaildation
     match = re.match(
         '^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', email)
+    is_valid = validate_email(email, verify=True)
 
     if match is None:
         messagebox.showerror("Email", "Please enter a valid email address ")
+    if is_valid is not True:
+        messagebox.showerror(
+            "Email", "Email address doesn't exist please try another email address")
     else:
         return True
 
@@ -163,19 +170,21 @@ def register2(username, password, confirm_password, email, var1):
     if username_check(username):
         # ensures the password passes all the vaildations
         if password_check(password, confirm_password):
-            if email_check1(email):  # ensures the email passes the vaildation
+            password_store = bcrypt.hashpw(password.encode("utf8"), bcrypt.gensalt())
+            if email_check(email):  # ensures the email passes the vaildation
                 if var1 == 1:  # inserts one whole record into student table
                     insert_student = (
                         "INSERT INTO Students(firstname,surname,age,class,gender,username,password,email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
                     cursor.execute(insert_student, [(shared_data["firstname"]), (shared_data["surname"]),
                                                     (shared_data["age"]), (shared_data["Class"]),
-                                                    (shared_data["gender"]), (username), (password), (email)])
+                                                    (shared_data["gender"]), (username), (password_store), (email)])
+
                 elif var1 == 2:  # inserts one whole record into the teacher table
                     insert_teacher = (
                         "INSERT INTO Teachers(firstname,surname,age,class,gender,username,password,email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
                     cursor.execute(insert_teacher, [(shared_data["firstname"]), (shared_data["surname"]),
                                                     (shared_data["age"]), (shared_data["Class"]),
-                                                    (shared_data["gender"]), (username), (password), (email)])
+                                                    (shared_data["gender"]), (username), (password_store), (email)])
 
                 db.commit()  # saves the changes to the database file
                 db.close()  # closes the connection to the database file

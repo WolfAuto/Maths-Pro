@@ -1,6 +1,6 @@
 import sqlite3 as sql
-from tkinter import messagebox
-with sql.connect("newfile.db") as db:
+import bcrypt
+with sql.connect("updatedfile.db") as db:
     global cursor
     cursor = db.cursor()
     cursor1 = db.cursor()
@@ -12,7 +12,7 @@ def login_in(username, password):
     elif student_check(username, password) is False and teacher_check(username, password) is True:
         return "T"
     else:
-        messagebox.showwarning("Account")
+        return False
 
 
 def student_check(username, password):
@@ -21,7 +21,7 @@ def student_check(username, password):
     checking = cursor.fetchone()
     if checking is not None:
         db_user, db_password = checking
-        if username == db_user and password == db_password:
+        if (username == db_user) and (bcrypt.checkpw(password.encode("utf8"), db_password) is True):
             return True
     else:
         return False
@@ -33,9 +33,7 @@ def teacher_check(username, password):
     checking1 = cursor1.fetchone()
     if checking1 is not None:
         db_user1, db_password1 = checking1
-        if username == db_user1 and password == db_password1:
+        if (username == db_user1) and (bcrypt.checkpw(password.encode("utf8"), db_password1) is True):
             return True
-        else:
-            pass
     else:
         return False

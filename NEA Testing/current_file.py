@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 # this is import the functionailty of the registration from another python file
 from remake_register import register1, register2
 title_font = ("Times New Roman", 50)  # Setting font for titles on the frames
@@ -52,7 +53,7 @@ class MathsPro(tk.Tk):
         # This allows the frame to be displayed and streched
         frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Main_Menu)  # sets the first frame to be shown is a register page
+        self.show_frame(Register)  # sets the first frame to be shown is a register page
 
     def show_frame(self, cont):  # method that takes in cont as a controller
 
@@ -64,10 +65,11 @@ class Register(tk.Frame):  # Creating a class that inheirts tk.Frame from tkinte
 
     def __init__(self, parent, controller):  # intialise the class register with self, args and kwargs
         tk.Frame.__init__(self, parent)  # intialise the frame with self and parent class
+        tk.Frame.config(self, bg="grey")
         self.controller = controller  # Controlller functions to be used in different frames
         # tk.Frame.config(self) allows the frame to be styled i.e changing background colour
         # Title Page of the Registration Form
-        title_label = tk.Label(self, text="Registration 1", font=title_font)
+        title_label = tk.Label(self, text="Registration 1", font=title_font, bg="grey")
         title_label.grid(row=0, column=0)
         # Adds a separator between instructions and the registration form
         separator = ttk.Separator(self, orient="vertical")
@@ -76,11 +78,11 @@ class Register(tk.Frame):  # Creating a class that inheirts tk.Frame from tkinte
         intro = (
             """Registration Page please enter your personal details\nand press the button to confirm your details""")
         intro_label = tk.Label(
-            self, text=intro, font=small_font)
+            self, text=intro, font=small_font, bg="grey")
         intro_label.grid(row=3, column=11)
 
         # Label for where the user enters their first name
-        firstname_label = tk.Label(self, text="First Name", font=small_font)
+        firstname_label = tk.Label(self, text="First Name", font=small_font, bg="grey")
         firstname_label.grid(row=1, column=0, pady=20)
 
         # Where the user enter their first name and the variable it is stored in
@@ -88,7 +90,7 @@ class Register(tk.Frame):  # Creating a class that inheirts tk.Frame from tkinte
         firstname_entry.grid(row=1, column=1)
 
         # Label for where the user enters their surname
-        surname_label = tk.Label(self, text="Surname", font=small_font)
+        surname_label = tk.Label(self, text="Surname", font=small_font, bg="grey")
         surname_label.grid(row=2, column=0, pady=20)
 
         # Entry of the surname of user and the variable it is stored in
@@ -96,7 +98,7 @@ class Register(tk.Frame):  # Creating a class that inheirts tk.Frame from tkinte
         surname_entry.grid(row=2, column=1)
 
         # Label for where the user enters their age
-        age_label = tk.Label(self, text="Age", font=small_font)
+        age_label = tk.Label(self, text="Age", font=small_font, bg="grey")
         age_label.grid(row=3, column=0, pady=20)
 
         # Entry for the Age of the student/teacher and the variable it is stored in
@@ -104,42 +106,42 @@ class Register(tk.Frame):  # Creating a class that inheirts tk.Frame from tkinte
         age_entry.grid(row=3, column=1)
 
         # Label for where the user enters their class
-        class_label = tk.Label(self, text="Class", font=small_font)
+        class_label = tk.Label(self, text="Class", font=small_font, bg="grey")
         class_label.grid(row=4, column=0, pady=20)
 
         # Entry for the class in which the student/teacher is apart of and the variable it is stored in
         all_classes = ["12C", "12D", "13C", "13D"]
         droplist = tk.OptionMenu(self, self.controller.shared_data["Class"], *all_classes)
-        droplist.config(width=20)
+        droplist.config(width=20, border="0")
         self.controller.shared_data["Class"].set("Select your class")
         droplist.grid(row=4, column=1)
 
         # Where the user enters their gender
-        gender_label = tk.Label(self, text="Gender", font=small_font)
+        gender_label = tk.Label(self, text="Gender", font=small_font, bg="grey")
         gender_label.grid(row=5, column=0, pady=20)
 
         # Using tkinter radiobuttons to make check box for gender
-        tk.Radiobutton(self, text="Male", padx=5, variable=self.controller.shared_data["var"], value=1).grid(
+        tk.Radiobutton(self, text="Male", padx=5, variable=self.controller.shared_data["var"], value=1, bg="grey").grid(
             row=5, column=1)  # The options for the user gender value 1 (male) and the variable it is stored in
-        tk.Radiobutton(self, text="Female", padx=20, variable=self.controller.shared_data["var"], value=2).grid(
+        tk.Radiobutton(self, text="Female", padx=20, variable=self.controller.shared_data["var"], value=2, bg="grey").grid(
             row=5, column=2)  # the options for the user gender value 2 (female) and the variable it is stored in
 
         # Label for where the user enters whether they are student or teacher
         school_label = tk.Label(self, text="School", width=20,
-                                font=small_font)
+                                font=small_font, bg="grey")
         school_label.grid(row=6, column=0, pady=20)
 
         # Using tkinter radiobuttons to make a check box for student or teacher
-        tk.Radiobutton(self, text="Student", padx=5, variable=self.controller.shared_data["var1"], value=1).grid(
+        tk.Radiobutton(self, text="Student", padx=5, variable=self.controller.shared_data["var1"], value=1, bg="grey").grid(
             row=6, column=1)  # Option for the user either value 1 (student) and the variable it is stored in
-        tk.Radiobutton(self, text="Teacher", padx=20, variable=self.controller.shared_data["var1"], value=2).grid(
+        tk.Radiobutton(self, text="Teacher", padx=20, variable=self.controller.shared_data["var1"], value=2, bg="grey").grid(
             row=6, column=2)  # Option for the user either value 2 (teacher) and the variable it is stored in
         # Enters all the user information using the register function from the other python file
 
         # Stores the image of the button
         photo = tk.PhotoImage(file="button.png")
         # Creates the button with the image stored
-        help_button = tk.Button(self, text="Help Button", image=photo)
+        help_button = tk.Button(self, text="Help Button", image=photo, bg="grey")
         # Removes the border on the button
         help_button.config(border="0")
         # Places the button in the bottom left corner
@@ -166,6 +168,7 @@ class Register(tk.Frame):  # Creating a class that inheirts tk.Frame from tkinte
                                       self.controller.shared_data["var"].get(
                                   ),
                                       self.controller.shared_data["var1"].get()))
+        enter_details.config(height=3, width=10)
         enter_details.grid(row=7, column=9)
 
     def register(self, controller, firstname, surname, age, school_class, var, var1):  # function used changing frames
@@ -246,18 +249,21 @@ class Register2(tk.Frame):
         back_button.config(height=3, width=10, bg="blue", fg="white")
         back_button.place(x=1050, y=750)
         # Creates account and emails the user
-        create_button = ttk.Button(self, text="Create Account", command=lambda: self.register(
+        create_button = tk.Button(self, text="Create Account", command=lambda: self.register(
             self.controller,
             self.controller.shared_data["username"].get(
             ), self.controller.shared_data["password"].get(),
             self.controller.shared_data["confirm_password"].get(
             ), self.controller.shared_data["email"].get(),
             self.controller.shared_data["var1"].get()))
+        create_button.config(height=3, width=10, bg="blue")
         create_button.grid(row=6, column=2)
 
     def register(self, controller, username, password, password_confirm, email, var1):
         if register2(username, password, password_confirm, email, var1) is True:
             controller.show_frame(Main_Menu)
+            messagebox.showinfo(
+                "Account Creation", "Account creation has been successful an email has been sent to you")
 
 
 class Main_Menu(tk.Frame):

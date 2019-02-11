@@ -176,7 +176,6 @@ def register2(username, password, confirm_password, email, var1):
                     send_email(email, username)
 
                 db.commit()  # saves the changes to the database file
-                db.close()  # closes the connection to the database file
                 return True
             else:
                 return False
@@ -193,6 +192,6 @@ def send_email(email, username):
                  "Surname:" + shared_data["surname"],
                  " Age:" + str(shared_data["age"]),
                  "Class: " + shared_data["Class"],
-                 "Gender:" + shared_data["firstname"],
+                 "Gender:" + shared_data["gender"],
                  "username:" + username)
     yag.send(to=email, subject="Maths Pro Email Confirmation", contents=send_mail)

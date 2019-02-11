@@ -168,7 +168,7 @@ class Register(tk.Frame):  # Creating a class that inheirts tk.Frame from tkinte
                                       self.controller.shared_data["var"].get(
                                   ),
                                       self.controller.shared_data["var1"].get()))
-        enter_details.config(height=3, width=10)
+        enter_details.config(height=3, width=10, bg="blue", fg="white")
         enter_details.grid(row=7, column=9)
 
     def register(self, controller, firstname, surname, age, school_class, var, var1):  # function used changing frames
@@ -256,7 +256,7 @@ class Register2(tk.Frame):
             self.controller.shared_data["confirm_password"].get(
             ), self.controller.shared_data["email"].get(),
             self.controller.shared_data["var1"].get()))
-        create_button.config(height=3, width=10, bg="blue")
+        create_button.config(height=3, width=10, bg="blue", fg="white")
         create_button.grid(row=6, column=2)
 
     def register(self, controller, username, password, password_confirm, email, var1):

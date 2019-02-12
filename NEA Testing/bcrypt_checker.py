@@ -7,3 +7,4 @@ def bcryptchecker():
     print(len(hashed))
 
 bcryptchecker()
+

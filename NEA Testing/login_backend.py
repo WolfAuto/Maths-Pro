@@ -1,5 +1,9 @@
 import sqlite3 as sql
 import bcrypt
+import yagmail
+from tkinter import messagebox
+from tkinter import simpledialog
+from remake_register import password_check
 with sql.connect("updatedfile.db") as db:
     global cursor
     cursor = db.cursor()
@@ -13,6 +17,27 @@ def login_in(username, password):
         return "T"
     else:
         return False
+
+
+def forgot_password(email, new_pass, confirm_pass):
+    if password_check(new_pass, confirm_pass) is True:
+        password_store = bcrypt.hashpw(new_pass.encode("utf8"), bcrypt.gensalt())
+        if (student_email(email) is not False and teacher_email(email) is False):
+            update_student = ("UPDATE Students SET password=? WHERE email=?")
+            cursor.execute(update_student, [(password_store), (email)])
+            db.commit()
+            return True
+
+        elif (student_email(email) is False and teacher_email(email) is not False):
+            update_teacher = ("UPDATE Teachers SET password=? WHERE email=?")
+            cursor.execute(update_teacher, [(password_store), (email)])
+            db.commit()
+            return True
+        else:
+            messagebox.showerror(
+                "Email", "Email doesn't exist either message support or register as you haven't made an account")
+    else:
+        pass
 
 
 def student_check(username, password):
@@ -37,3 +62,47 @@ def teacher_check(username, password):
             return True
     else:
         return False
+
+
+def student_email(email):
+    find_student = ("SELECT Students.email FROM Students WHERE email = ?")
+    cursor.execute(find_student, [(email)])
+    result = cursor.fetchone()
+    if result is not None:
+        db_email = result
+        if email == db_email:
+            return True
+
+    else:
+        return False
+
+
+def teacher_email(email):
+    find_teacher = ("SELECT Teachers.email FROM Teachers WHERE email = ?")
+    cursor1.execute(find_teacher, [(email)])
+    checking = cursor1.fetchone()
+    if checking is not None:
+        db_email = checking
+        if email == db_email:
+            return True
+    else:
+        return False
+
+
+def support_email():
+    support_window = tk.Tk()
+
+    yag = yagmail.SMTP("mathspro0@gmail.com", oauth2_file="~/oauth2_creds.json")
+
+    text = simpledialog.askstring(
+        "Input", "Enter your problem or advice to send to Maths Pro", parent=support_window)
+
+    send_mail = ("Email to Maths Pro",
+                 text)
+    if text is not None:
+        yag.send(subject="Maths Pro Support Email", contents=send_mail)
+        return True
+    else:
+        messagebox.showerror(
+            "Support", "Please don't leave support mesage blank and \n send reasonable messages to support email Thank You ")
+    support_window.tk.quit()

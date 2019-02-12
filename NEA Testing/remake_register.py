@@ -4,6 +4,7 @@ import string
 import re
 import bcrypt
 from validate_email import validate_email
+import yagmail
 with sql.connect("updatedfile.db") as db:  # sets the connection to tbe database file
     global cursor  # makes the cursor a global variable for all parts of the program
     global cursor1
@@ -41,46 +42,40 @@ def register1(firstname, surname, age, school_class, var, var1):  # Function for
                 if school_class.isalnum() is True:
                     if var == 1:  # changing the var to a gender either male or female depending on value
                         if (var1 == 1) or (var1 == 2):
-                            print(firstname, surname, age, school_class, var1)
                             shared_data["firstname"] = firstname
                             shared_data["surname"] = surname
                             shared_data["age"] = age1
                             shared_data["gender"] = "Male"
                             shared_data["Class"] = school_class
-                            for key, val in shared_data.items():
-                                print(key, "=>", val)
                             return True
                         else:
-                            messagebox.showwarning(
+                            messagebox.showerror(
                                 "School", "Please choose either Student or Teacher")
                             return False
 
                     elif var == 2:
                         if (var1 == 1) or (var1 == 2):
-                            print(firstname, surname, age, school_class, var1)
                             shared_data["firstname"] = firstname
                             shared_data["surname"] = surname
                             shared_data["age"] = age1
                             shared_data["gender"] = "Female"
                             shared_data["Class"] = school_class
-                            for key, val in shared_data.items():
-                                print(key, "=>", val)
                             return True
                         else:
-                            messagebox.showwarning(
+                            messagebox.showerror(
                                 "School", "Please choose either Student or Teacher")
                             return False
                     else:
-                        messagebox.showwarning("Gender", "Gender option cannot be left blank")
+                        messagebox.showerror("Gender", "Gender option cannot be left blank")
                         return False
                 else:
-                    messagebox.showwarning("Class", "Class option cannot be left blank")
+                    messagebox.showerror("Class", "Class option cannot be left blank")
             except ValueError:
-                messagebox.showwarning("Age", "Please enter a number")
+                messagebox.showerror("Age", "Please enter a number")
         else:
-            messagebox.showwarning("Surname", "Please enter a Proper Surname")
+            messagebox.showerror("Surname", "Please enter a Proper Surname")
     else:
-        messagebox.showwarning("First Name", "Please enter a proper First Name")
+        messagebox.showerror("First Name", "Please enter a proper First Name")
 
 
 def username_check(username):  # function for username vaildation
@@ -101,7 +96,7 @@ def username_check(username):  # function for username vaildation
             return True
 
     else:
-        messagebox.showwarning(
+        messagebox.showerror(
             "Username", "Username has to be 6 or more characters")
 
 
@@ -115,36 +110,30 @@ def password_check(password, password_confirm):  # function for password vaildat
                     # checks for uppercase characters
                     if (len(set(string.digits).intersection(password))) > 0:
                         if (len(set(string.punctuation).intersection(password))) > 0:
-                            if password == password_confirm:  # ensures that the two password variables match
-                                return True
-                            else:
-                                messagebox.showwarning(
-                                    "Password", "Passwords don't match re enter confirm password again")
-                                # tkinter error message
-                                return False
+                            return True
                         else:
-                            messagebox.showwarning(
+                            messagebox.showerror(
                                 "Password", "Password doesn't contain a special character")
                             return False
                     else:
                         # tkinter error message
-                        messagebox.showwarning(
+                        messagebox.showerror(
                             "Password", "Password don't contain numbers")
                         return False
                 else:
-                    messagebox.showwarning(
+                    messagebox.showerror(
                         "Password", "Password don't contain any uppercase characters")  # tkinter error message
                     return False
             else:
-                messagebox.showwarning(
+                messagebox.showerror(
                     "Password", "Password don't contain any lowercase letters")  # tkinter error message
             return False
         else:
-            messagebox.showwarning(
+            messagebox.showerror(
                 "Password", "Password is not 8 characters long")  # tkinter error message
             return False
     else:
-        messagebox.showwarning(
+        messagebox.showerror(
             "Password", "Password don't match")  # tkinter error message
         return False
 
@@ -176,6 +165,7 @@ def register2(username, password, confirm_password, email, var1):
                     cursor.execute(insert_student, [(shared_data["firstname"]), (shared_data["surname"]),
                                                     (shared_data["age"]), (shared_data["Class"]),
                                                     (shared_data["gender"]), (username), (password_store), (email)])
+                    send_email(email, username)
 
                 elif var1 == 2:  # inserts one whole record into the teacher table
                     insert_teacher = (
@@ -183,9 +173,9 @@ def register2(username, password, confirm_password, email, var1):
                     cursor.execute(insert_teacher, [(shared_data["firstname"]), (shared_data["surname"]),
                                                     (shared_data["age"]), (shared_data["Class"]),
                                                     (shared_data["gender"]), (username), (password_store), (email)])
+                    send_email(email, username)
 
                 db.commit()  # saves the changes to the database file
-                db.close()  # closes the connection to the database file
                 return True
             else:
                 return False
@@ -193,3 +183,15 @@ def register2(username, password, confirm_password, email, var1):
             return False
     else:
         return False
+
+
+def send_email(email, username):
+    yag = yagmail.SMTP("mathspro0@gmail.com", oauth2_file="~/oauth2_creds.json")
+    send_mail = (" Email Confirmation From Maths Pro",
+                 " First Name:" + shared_data["firstname"],
+                 "Surname:" + shared_data["surname"],
+                 " Age:" + str(shared_data["age"]),
+                 "Class: " + shared_data["Class"],
+                 "Gender:" + shared_data["gender"],
+                 "username:" + username)
+    yag.send(to=email, subject="Maths Pro Email Confirmation", contents=send_mail)

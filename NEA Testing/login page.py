@@ -138,7 +138,7 @@ class StudentArea(tk.Frame):
         teacher_button.pack(side="right", anchor="e")
 
         info_text = tk.Label(
-            self, text="Welcome Student please choose from the following", font=medium_font, bg="grey", fg="white")
+            self, text="Welcome Student please choose from the following", font=medium_font, bg="grey")
         info_text.place(x=350, y=100)
         account_button = tk.Button(self, text="View Account Infomation")
         account_button.config(height=5, width=30, bg="blue", fg="white")
@@ -159,8 +159,9 @@ class StudentArea(tk.Frame):
         photo = tk.PhotoImage(file="button.png")
         help_button = tk.Button(self, text="Help Button", image=photo,
                                 command=lambda: controller.show_frame(Help_Page))
-        help_button.config(border="0")
+        help_button.config(border="0", bg="grey")
         help_button.place(x=0, y=730)
+        help_button.image = photo
 
         logout_button = tk.Button(self, text="Log out",
                                   command=lambda: controller.show_frame(Main_Menu))
@@ -206,8 +207,9 @@ class TeacherArea(tk.Frame):
         photo = tk.PhotoImage(file="button.png")
         help_button = tk.Button(self, text="Help Button", image=photo,
                                 command=lambda: controller.show_frame(Help_Page))
-        help_button.config(border="0")
+        help_button.config(border="0", bg="grey")
         help_button.place(x=0, y=730)
+        help_button.image = photo
 
         logout_button = tk.Button(self, text="Log out",
                                   command=lambda: controller.show_frame(Main_Menu))
@@ -273,7 +275,7 @@ class Help_Page(tk.Frame):
         help_button1.config(fg="white", bg="blue", height=3)
         help_button1.place(x=150, y=105)
         label_1 = tk.Label(
-            self, text="Maths Pro is a revision app around maths \n that allows for continuous revision A level Maths", bg="cyan", font=small_font)
+            self, text="Maths Pro is a revision app around maths \n that allows for continuous revision on A level Maths", bg="cyan", font=small_font)
         label_1.invisible = False
 
         help_button2 = tk.Button(self, text="Questions", command=toggle1)
@@ -347,8 +349,8 @@ class Help_Page(tk.Frame):
         confirm_entry = tk.Entry(self, textvariable=confirm_input, show="*")
         confirm_entry.place(x=1000, y=520)
 
-        enter_button = tk.Button(self, text="Enter details", bg="blue", fg="white", command=lambda: self.change_password(
-            email_input.get(), password_input.get(), confirm_input.get()))
+        enter_button = tk.Button(self, text="Enter details", bg="blue", fg="white", command=lambda: [self.change_password(email_input.get(
+        ), password_input.get(), confirm_input.get()), email_entry.delete(0, tk.END), password_entry.delete(0, tk.END), confirm_entry.delete(0, tk.END)])
         enter_button.config(height=3, width=10)
         enter_button.place(x=890, y=600)
 

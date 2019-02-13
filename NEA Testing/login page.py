@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
-from login_backend import login_in
-from login_backend import forgot_password
+from login_backend import login_in, forgot_password, support_email
+
 from tkinter import messagebox
 title_font = ("Times New Roman", 50)
 medium_font = ("Times New Roman", 20)

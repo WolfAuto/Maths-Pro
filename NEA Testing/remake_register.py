@@ -186,7 +186,7 @@ def register2(username, password, confirm_password, email, var1):
 
 
 def send_email(email, username):
-    yag = yagmail.SMTP("mathspro0@gmail.com", oauth2_file="~/oauth2_creds.json")
+    yag = yagmail.SMTP("mathspro0@gmail.com", oauth2_file="~/oauth2_creds1.json")
     send_mail = (" Email Confirmation From Maths Pro",
                  " First Name:" + shared_data["firstname"],
                  "Surname:" + shared_data["surname"],

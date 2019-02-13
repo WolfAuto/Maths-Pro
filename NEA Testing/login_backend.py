@@ -1,6 +1,7 @@
 import sqlite3 as sql
 import bcrypt
 import yagmail
+import tkinter as tk
 from tkinter import messagebox
 from tkinter import simpledialog
 from remake_register import password_check
@@ -8,6 +9,15 @@ with sql.connect("updatedfile.db") as db:
     global cursor
     cursor = db.cursor()
     cursor1 = db.cursor()
+
+
+def back_button(school):
+    if school is "Student":
+        return "S"
+    elif school is "Teacher":
+        return "T"
+    else:
+        return "M"
 
 
 def login_in(username, password):
@@ -92,7 +102,7 @@ def teacher_email(email):
 def support_email():
     support_window = tk.Tk()
 
-    yag = yagmail.SMTP("mathspro0@gmail.com", oauth2_file="~/oauth2_creds.json")
+    yag = yagmail.SMTP("mathspro0@gmail.com", oauth2_file="~/oauth2_creds1.json")
 
     text = simpledialog.askstring(
         "Input", "Enter your problem or advice to send to Maths Pro", parent=support_window)
@@ -101,8 +111,9 @@ def support_email():
                  text)
     if text is not None:
         yag.send(subject="Maths Pro Support Email", contents=send_mail)
+        support_window.destroy()
         return True
     else:
-        messagebox.showerror(
-            "Support", "Please don't leave support mesage blank and \n send reasonable messages to support email Thank You ")
-    support_window.tk.quit()
+        return messagebox.showerror(
+            "Support", "Please don't leave support message blank and \n send reasonable messages to support email Thank You")
+        support_window.destroy()

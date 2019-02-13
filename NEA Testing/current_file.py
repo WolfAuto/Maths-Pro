@@ -5,7 +5,7 @@ from tkinter import messagebox
 from remake_register import register1, register2
 title_font = ("Times New Roman", 50)  # Setting font for titles on the frames
 large_font = ("Times New Roman", 24)  # Setting fonts for main headings
-medium_font = ("Times New Roman", 16)  # Setting fonts for text that will appear on the screen
+medium_font = ("Times New Roman", 20)  # Setting fonts for text that will appear on the screen
 small_font = ("Times New Roman", 12)  # Setting fonts for small deails to be displayed
 
 # http://inloop.github.io/sqlite-viewer/ for checking the database file https://sqliteonline.com/

@@ -6,7 +6,6 @@ from tkinter import messagebox
 from tkinter import simpledialog
 from remake_register import password_check
 with sql.connect("updatedfile.db") as db:
-    global cursor
     cursor = db.cursor()
     cursor1 = db.cursor()
 
@@ -101,6 +100,7 @@ def teacher_email(email):
 
 def support_email():
     support_window = tk.Tk()
+    support_window.withdraw()
 
     yag = yagmail.SMTP("mathspro0@gmail.com", oauth2_file="~/oauth2_creds1.json")
 

@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+
 # this is import the functionailty of the registration from another python file
 from remake_register import register1, register2
 title_font = ("Times New Roman", 50)  # Setting font for titles on the frames

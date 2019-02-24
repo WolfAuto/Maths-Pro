@@ -6,8 +6,6 @@ import bcrypt
 from validate_email import validate_email
 import yagmail
 with sql.connect("updatedfile.db") as db:  # sets the connection to tbe database file
-    global cursor  # makes the cursor a global variable for all parts of the program
-    global cursor1
     cursor = db.cursor()  # sets the cursor to allow sql statement execution
     cursor1 = db.cursor()
 shared_data = {"firstname": "blank",  # dictionary that stores the user register information
@@ -15,17 +13,17 @@ shared_data = {"firstname": "blank",  # dictionary that stores the user register
                "age": 0,        # to different frames
                "Class": "blank",
                "gender": "blank", }
-create_student_table = ("""CREATE TABLE IF NOT EXISTS Students(account_id INTEGER PRIMARY KEY,
-                        firstname VARCHAR(30),
-                        surname VARCHAR(30) ,  age INTEGER ,
-                        class VARCHAR (3), gender VARCHAR (30) ,
-                         username VARCHAR(30),password VARCHAR(80), email VARCHAR(30))""")
+create_student_table = ("""CREATE TABLE IF NOT EXISTS Students(ID INTEGER PRIMARY KEY,
+                        Forename VARCHAR(30),
+                        Surname VARCHAR(30) ,  Age INTEGER ,
+                        class VARCHAR (3), Gender VARCHAR (30) ,
+                         Username VARCHAR(30),Password VARCHAR(80), Email VARCHAR(30))""")
 
-create_teacher_table = ("""CREATE TABLE IF NOT EXISTS Teachers(account_id INTEGER PRIMARY KEY,
-                        firstname VARCHAR(30) ,
-                        surname VARCHAR(30) ,  age INTEGER ,
-                        class VARCHAR (3) , gender VARCHAR (30),
-                         username VARCHAR(30), password VARCHAR(80), email VARCHAR(30))""")
+create_teacher_table = ("""CREATE TABLE IF NOT EXISTS Teachers( ID INTEGER PRIMARY KEY,
+                        Forename VARCHAR(30) ,
+                        Surname VARCHAR(30) ,  Age INTEGER ,
+                        Class VARCHAR (3) , Gender VARCHAR (30),
+                         Username VARCHAR(30), Password VARCHAR(80), Email VARCHAR(30))""")
 # Sql statment to create the table where the user information will be stored
 cursor.execute(create_student_table)  # executes the sql statement
 
@@ -83,9 +81,9 @@ def username_check(username):  # function for username vaildation
     if len(username) >= 6:
         # sql statement for checking existing users
         # Checks student database for username
-        fetchstudents = ("SELECT DISTINCT Students.username from Students WHERE username = ?")
+        fetchstudents = ("SELECT DISTINCT Students.Username from Students WHERE Username = ?")
         # Checkes teacher databaase for username
-        fetchteachers = ("SELECT DISTINCT Teachers.username from Teachers WHERE username = ?")
+        fetchteachers = ("SELECT DISTINCT Teachers.Username from Teachers WHERE Username = ?")
         cursor.execute(fetchstudents, [(username)])  # executes the above query on the student table
         cursor1.execute(fetchteachers, [(username)])  # execute the above query on the teacher table
         checking = cursor.fetchall()  # stores the result of sql search
@@ -161,7 +159,7 @@ def register2(username, password, confirm_password, email, var1):
             if email_check(email):  # ensures the email passes the vaildation
                 if var1 == 1:  # inserts one whole record into student table
                     insert_student = (
-                        "INSERT INTO Students(firstname,surname,age,class,gender,username,password,email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+                        "INSERT INTO Students(Forename,Surname,Age,Class,Gender,Username,Password,Email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
                     cursor.execute(insert_student, [(shared_data["firstname"]), (shared_data["surname"]),
                                                     (shared_data["age"]), (shared_data["Class"]),
                                                     (shared_data["gender"]), (username), (password_store), (email)])
@@ -169,7 +167,7 @@ def register2(username, password, confirm_password, email, var1):
 
                 elif var1 == 2:  # inserts one whole record into the teacher table
                     insert_teacher = (
-                        "INSERT INTO Teachers(firstname,surname,age,class,gender,username,password,email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+                        "INSERT INTO Teachers(Forename,Surname,Age,Class,Gender,Username,Password,Email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
                     cursor.execute(insert_teacher, [(shared_data["firstname"]), (shared_data["surname"]),
                                                     (shared_data["age"]), (shared_data["Class"]),
                                                     (shared_data["gender"]), (username), (password_store), (email)])

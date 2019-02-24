@@ -3,7 +3,9 @@ from tkinter import ttk
 from tkinter import messagebox
 # this is import the functionailty of the registration from another python file
 from remake_register import register1, register2
+from test_dates import set_test, show_details
 from login_backend import login_in, forgot_password, support_email, back_button
+import view_account as va
 
 
 title_font = ("Times New Roman", 50)  # Setting font for titles on the frames
@@ -29,7 +31,17 @@ class MathsPro(tk.Tk):
                             "confirm_password": tk.StringVar(),
                             "email": tk.StringVar(),
                             "login_username": "blank",
-                            "School": "blank"}
+                            "School": "blank",
+                            "header": None,
+                            "details": None,
+                            "date": tk.StringVar(),
+                            "var_type": tk.IntVar(),
+                            "var_level": tk.IntVar(),
+                            "comments": tk.StringVar(),
+                            "AS": None,
+                            "A2": None,
+                            "Pure": None,
+                            "Applied:": None}
 
         tk.Tk.wm_title(self, "Maths Pro")  # Sets the title of each page to be Maths Pro
         container = tk.Frame(self)  # defined a container for all the frame be kept
@@ -42,7 +54,7 @@ class MathsPro(tk.Tk):
 
         self.frames = {}  # Empty dictionary where all the frames are kept
         # contains all the pages being used doesn't work without multiple frames (more than one)
-        for F in (Main_Menu, Register, Register2, StudentArea, TeacherArea, Help_Page, ViewAccountInfo):
+        for F in (Main_Menu, Register, Register2, StudentArea, TeacherArea, Help_Page, ViewAccountInfo, SetTestDate):
 
             # Defines the frame from the for loop which contains all the pages
             frame = F(container, self)
@@ -56,12 +68,23 @@ class MathsPro(tk.Tk):
         # This allows the frame to be displayed and streched
         frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(ViewAccountInfo)  # sets the first frame to be shown is a register page
+        self.show_frame(Main_Menu)  # sets the first frame to be shown is a register page
+
+    def get_page(self, page_class):
+        return self.frames[page_class]
 
     def show_frame(self, cont):  # method that takes in cont as a controller
 
         frame = self.frames[cont]  # Defines the frame from the chosen frame in the dictionary
         frame.tkraise()  # Brings the frame to the top for the user to see
+        frame.update()
+        frame.event_generate("<<ShowFrame>>")
+
+    def update_widgets(self, frame_list, widget_name, criteria, output):
+        for i in frame_list:
+            frame = self.frames[i]
+            label = getattr(frame, widget_name)
+            label[criteria] = output
 
 
 class Main_Menu(tk.Frame):
@@ -136,7 +159,6 @@ class Main_Menu(tk.Frame):
             controller.show_frame(StudentArea)
             self.controller.shared_data["login_username"] = username
             self.controller.shared_data["School"] = "Student"
-            print(self.controller.shared_data["login_username"])
         elif login_in(username, password) == "T":
             controller.show_frame(TeacherArea)
             self.controller.shared_data["login_username"] = username
@@ -342,7 +364,7 @@ class Register2(tk.Frame):
             self.controller.shared_data["confirm_password"].get(
             ), self.controller.shared_data["email"].get(),
             self.controller.shared_data["var1"].get()))
-        create_button.config(height=3, width=10, bg="blue", fg="white")
+        create_button.config(height=3, width=12, bg="blue", fg="white")
         create_button.grid(row=6, column=2)
 
     def register(self, controller, username, password, password_confirm, email, var1):
@@ -356,19 +378,19 @@ class StudentArea(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         tk.Frame.config(self, bg="grey")
+        self.controller = controller
+        self.bind("<<ShowFrame>>", self.on_show_frame)
+
         label = tk.Label(self, text="Student Area", font=title_font)
         label.config(bg="blue", fg="white")
         label.pack(pady=10, padx=10, side="top", anchor="nw")
-
-        teacher_button = tk.Button(self, text="Teacher Area",
-                                   command=lambda: controller.show_frame(TeacherArea))
-        teacher_button.pack(side="right", anchor="e")
 
         info_text = tk.Label(
             self, text="Welcome Student please choose from the following", font=medium_font, bg="grey")
         info_text.place(x=350, y=100)
         account_button = tk.Button(self, text="View Account Infomation",
-                                   command=lambda: controller.show_frame(ViewAccountInfo))
+                                   command=lambda: [controller.show_frame(ViewAccountInfo),
+                                                    self.update_labels()])
         account_button.config(height=5, width=30, bg="blue", fg="white")
         account_button.place(x=400, y=450)
 
@@ -400,11 +422,39 @@ class StudentArea(tk.Frame):
         quit_button.config(height=3, width=10, bg="blue", fg="white")
         quit_button.place(x=1200, y=750)
 
+        test_button = tk.Button(self, text="Show Tests", command=lambda: show_details())
+        test_button.config(height=3, width=10, bg="blue", fg="white")
+        test_button.place(x=100, y=650)
+
+    def on_show_frame(self, event):
+        print("setting variables")
+        if va.view_info(self.controller.shared_data["login_username"], self.controller.shared_data["School"]) is "S":
+            self.controller.update_widgets(
+                [ViewAccountInfo], "header", "text", va.header)
+            self.controller.update_widgets(
+                [ViewAccountInfo], "result", "text", va.result)
+            return True
+        elif va.view_info(self.controller.shared_data["login_username"], self.controller.shared_data["School"]) is "T":
+            print("Teacher")
+            self.controller.shared_data["header"] = va.header
+            self.controller.shared_data["details"] = va.result
+
+            return True
+
+    def update_labels(self):
+        va.view_info(self.controller.shared_data["login_username"],
+                     self.controller.shared_data["School"])
+        self.controller.update_widgets(
+            [ViewAccountInfo], "header", "text", va.header)
+        self.controller.update_widgets(
+            [ViewAccountInfo], "result", "text", va.result)
+
 
 class TeacherArea(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         tk.Frame.config(self, bg="grey")
+        self.controller = controller
         label_text = tk.Label(self, text="Teacher Area", font=title_font)
         label_text.config(bg="blue", fg="white")
         label_text.pack(pady=10, padx=10, anchor="nw")
@@ -412,12 +462,8 @@ class TeacherArea(tk.Frame):
             self, text="Welcome Teacher please choose from the following", font=medium_font, bg="grey")
         info_text.place(x=350, y=100)
 
-        button1 = tk.Button(self, text="Student Area",
-                            command=lambda: controller.show_frame(StudentArea))
-        button1.pack()
-
         account_info = tk.Button(self, text="View Account Information",
-                                 command=lambda: controller.show_frame(ViewAccountInfo))
+                                 command=lambda: [controller.show_frame(ViewAccountInfo), self.update_labels()])
         account_info.config(height=5, width=30, bg="blue", fg="white")
         account_info.place(x=750, y=450)
 
@@ -429,7 +475,8 @@ class TeacherArea(tk.Frame):
         flagged_students.place(x=750, y=250)
         flagged_students.config(height=5, width=30, bg="blue", fg="white")
 
-        test_date = tk.Button(self, text="Set Test Date")
+        test_date = tk.Button(self, text="Set Test Date",
+                              command=lambda: controller.show_frame(SetTestDate))
         test_date.place(x=400, y=450)
         test_date.config(height=5, width=30, bg="blue", fg="white")
 
@@ -449,11 +496,20 @@ class TeacherArea(tk.Frame):
         quit_button.config(fg="white", bg="blue", height=3, width=10)
         quit_button.place(x=1200, y=750)
 
+    def update_labels(self):
+        va.view_info(self.controller.shared_data["login_username"],
+                     self.controller.shared_data["School"])
+        self.controller.update_widgets(
+            [ViewAccountInfo], "header", "text", va.header)
+        self.controller.update_widgets(
+            [ViewAccountInfo], "result", "text", va.result)
+
 
 class Help_Page(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         tk.Frame.config(self, bg="cyan")
+        self.controller = controller
 
         label = tk.Label(self, text="Help Page", font=title_font)
         label.config(bg="cyan")
@@ -584,7 +640,7 @@ class Help_Page(tk.Frame):
         enter_button.place(x=890, y=600)
 
         back_button = tk.Button(self, text="Back",
-                                command=lambda: controller.show_frame(Main_Menu))
+                                command=lambda: self.changing_frames(controller, self.controller.shared_data["School"]))
         back_button.config(height=3, width=10, bg="blue", fg="white")
         back_button.place(x=1050, y=750)
 
@@ -605,7 +661,7 @@ class Help_Page(tk.Frame):
             controller.show_frame(StudentArea)
         elif back_button(school) is "T":
             controller.show_frame(TeacherArea)
-        elif back_button(school) is "M":
+        else:
             controller.show_frame(Main_Menu)
 
 
@@ -614,14 +670,27 @@ class ViewAccountInfo(tk.Frame):
         tk.Frame.__init__(self, parent)
         tk.Frame.config(self, bg="grey")
         self.controller = controller
-        # Title Page of the second part of the Registration Form
-        label = tk.Label(self, text="View Account Information", font=title_font, bg="grey")
+        self.bind("<<ShowFrame>>", self.on_show_frame)
+
+        label = tk.Label(self, text="View Account Info", font=title_font)
         label.config(bg="blue", fg="white")
         label.pack(pady=10, padx=10, side="top", anchor="nw")
 
+        self.w_header = None
+
+        self.w_result = None
+
+        self.header = tk.Label(self, text=self.w_header, font=title_font, bg="grey")
+        self.header.pack()
+
+        self.result = tk.Label(self, text=self.w_result, font=title_font, bg="grey")
+        self.result.pack()
+
         photo = tk.PhotoImage(file="button.png")
+
         # Creates the button with the image stored
-        help_button = tk.Button(self, text="Help Button", image=photo)
+        help_button = tk.Button(self, text="Help Button", image=photo,
+                                command=lambda: controller.show_frame(Help_Page))
         # Removes the border on the button
         help_button.config(border="0",  bg="grey")
         # Places the button in the bottom left corner
@@ -644,6 +713,100 @@ class ViewAccountInfo(tk.Frame):
             controller.show_frame(StudentArea)
         elif back_button(school) is "T":
             controller.show_frame(TeacherArea)
+
+    def on_show_frame(self, event):
+        print("setting variables")
+
+        self.controller.update_widgets(
+            [ViewAccountInfo], "header", "text", None)
+        self.controller.update_widgets(
+            [ViewAccountInfo], "result", "text", None)
+
+        return True
+
+
+class SetTestDate(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        tk.Frame.config(self, bg="grey")
+        self.controller = controller
+
+        # Title Page of the second part of the Registration Form
+        label = tk.Label(self, text="Set Test Date", font=title_font, bg="grey")
+        label.grid(row=0, column=0)
+        # Adds a separator between the form and instruction text
+        separator = ttk.Separator(self, orient="vertical")
+        separator.grid(row=1, column=3, rowspan=7, sticky="ns")
+        # instruction text for username and password
+        guide = ("Enter test date, test type, test level and any other comments that you would like to add. \n Note: Date format should be YYYY/MM/DD, leaving a comment is optional")
+        label_text = tk.Label(self, text=guide, font=small_font, bg="grey")
+        label_text.grid(row=2, column=4)
+
+        # Label for where the user enters their username
+        test_label = tk.Label(self, text="Test Date", font=small_font, bg="grey")
+        test_label.grid(row=1, column=0, pady=20)
+        # Entry for username and the variable it is stored in
+        test_entry = tk.Entry(self, textvariable=self.controller.shared_data["date"])
+        test_entry.grid(row=1, column=1)
+
+        # Label for where the user enters the test type
+        type_label = tk.Label(self, text="Test Type", bg="grey", font=small_font)
+        type_label.grid(row=2, column=0, pady=20)
+
+        # Using tkinter radiobuttons to make check box for gender
+        tk.Radiobutton(self, text="Pure", padx=5, variable=self.controller.shared_data["var_type"], value=1, bg="grey").grid(
+            row=2, column=1)  # The options for the user gender value 1 (male) and the variable it is stored in
+        tk.Radiobutton(self, text="Applied", padx=20, variable=self.controller.shared_data["var_type"], value=2, bg="grey").grid(
+            row=2, column=2)  # the options for the user gender value 2 (female) and the variable it is stored in
+
+        # Label for where the user enters whether the test is AS or A2
+        level_label = tk.Label(self, text="Test Level", width=20,
+                               font=small_font, bg="grey")
+        level_label.grid(row=3, column=0, pady=20)
+
+        # Using tkinter radiobuttons to make a check box for AS or A2
+        tk.Radiobutton(self, text="AS", padx=5, variable=self.controller.shared_data["var_level"], value=1, bg="grey").grid(
+            row=3, column=1)  # Option for the user either value 1 (AS) and the variable it is stored in
+        tk.Radiobutton(self, text="A2", padx=20, variable=self.controller.shared_data["var_level"], value=2, bg="grey").grid(
+            row=3, column=2)  # Option for the user either value 2 (A2) and the variable it is stored in
+
+        comments_label = tk.Label(self, text="Comments", bg="grey", font=small_font)
+        comments_label.grid(row=4, column=0)
+
+        comments_entry = tk.Entry(
+            self, textvariable=self.controller.shared_data["comments"])
+        comments_entry.grid(row=4, column=1)
+
+        # Terminates the whole program
+        quit_button = tk.Button(self, text="Exit", command=lambda: quit(self))
+        quit_button.config(fg="white", bg="blue", height=3, width=10)
+        quit_button.place(x=1200, y=750)
+        # Alllows the user to go back to previous screen
+        back_button = tk.Button(self, text="Back",
+                                command=lambda: controller.show_frame(TeacherArea))
+        back_button.config(height=3, width=10, bg="blue", fg="white")
+        back_button.place(x=1050, y=750)
+
+        create_button = tk.Button(self, text="Set Test Date", command=lambda: [self.test_date(
+            controller, self.controller.shared_data["date"].get(), self.controller.shared_data["var_type"].get(), self.controller.shared_data["var_level"].get(), self.controller.shared_data["comments"].get()), test_entry.delete(0, tk.END), comments_entry.delete(0, tk.END)])
+        create_button.config(bg="blue", fg="white", height=3, width=10)
+
+        create_button.grid(row=5, column=2)
+
+    def test_date(self, controller, date, type, level, comments):
+        if set_test(date, type, level, comments) is True:
+            messagebox.showinfo("Test", "Test Date has been set")
+            controller.show_frame(TeacherArea)
+
+
+class Questions(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        tk.Frame.config(self, bg="grey")
+
+        type_label = tk.Label(self, text="Test Type")
+
+        tk.Radiobutton(self, text="Pure", padx=5, self.controller.shared_data["Pure"], value=1)
 
 
 root = MathsPro()  # this runs the Maths Pro class

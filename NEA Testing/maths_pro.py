@@ -6,10 +6,10 @@ from remake_register import register1, register2
 from test_dates import set_test, show_details
 from login_backend import login_in, forgot_password, support_email, back_button
 import view_account as va
-
+import student_class as sc
 
 title_font = ("Times New Roman", 50)  # Setting font for titles on the frames
-large_font = ("Times New Roman", 24)  # Setting fonts for main headings
+large_font = ("Times New Roman", 30)  # Setting fonts for main headings
 medium_font = ("Times New Roman", 16)  # Setting fonts for text that will appear on the screen
 small_font = ("Times New Roman", 12)  # Setting fonts for small deails to be displayed
 
@@ -38,10 +38,10 @@ class MathsPro(tk.Tk):
                             "var_type": tk.IntVar(),
                             "var_level": tk.IntVar(),
                             "comments": tk.StringVar(),
-                            "AS": None,
-                            "A2": None,
-                            "Pure": None,
-                            "Applied:": None}
+                            "test_type": tk.IntVar(),
+                            "test_level": tk.StringVar(),
+                            "Pure Loop": None,
+                            "Applied Loop": None}
 
         tk.Tk.wm_title(self, "Maths Pro")  # Sets the title of each page to be Maths Pro
         container = tk.Frame(self)  # defined a container for all the frame be kept
@@ -54,7 +54,7 @@ class MathsPro(tk.Tk):
 
         self.frames = {}  # Empty dictionary where all the frames are kept
         # contains all the pages being used doesn't work without multiple frames (more than one)
-        for F in (Main_Menu, Register, Register2, StudentArea, TeacherArea, Help_Page, ViewAccountInfo, SetTestDate):
+        for F in (Main_Menu, Register, Register2, StudentArea, TeacherArea, Help_Page, ViewAccountInfo, SetTestDate, entry_questions, StudentandClass):
 
             # Defines the frame from the for loop which contains all the pages
             frame = F(container, self)
@@ -135,14 +135,6 @@ class Main_Menu(tk.Frame):
         register_button.config(height=3, width=15, bg="blue", fg="white")
         register_button.place(x=720, y=420)
 
-        button1 = ttk.Button(self, text="Student Area",
-                             command=lambda: controller.show_frame(StudentArea))
-        button1.pack(side="right", anchor="e")
-
-        button2 = ttk.Button(self, text="Teacher Area",
-                             command=lambda: controller.show_frame(TeacherArea))
-        button2.pack(side="right", anchor="w")
-
         photo = tk.PhotoImage(file="button.png")
         help_button = tk.Button(self, image=photo,
                                 command=lambda: controller.show_frame(Help_Page))
@@ -182,7 +174,7 @@ class Register(tk.Frame):  # Creating a class that inheirts tk.Frame from tkinte
         separator.grid(row=1, column=10, rowspan=7, sticky="ns")
         # Label giving instructions on what to do
         intro = (
-            """Registration Page please enter your personal details\nand press the button to confirm your details""")
+            """Registration Page please enter your personal details\nand press the button to confirm your details please enter a captial letter for your frstname and surname""")
         intro_label = tk.Label(
             self, text=intro, font=small_font, bg="grey")
         intro_label.grid(row=3, column=11)
@@ -244,18 +236,6 @@ class Register(tk.Frame):  # Creating a class that inheirts tk.Frame from tkinte
             row=6, column=2)  # Option for the user either value 2 (teacher) and the variable it is stored in
         # Enters all the user information using the register function from the other python file
 
-        # Stores the image of the button
-        photo = tk.PhotoImage(file="button.png")
-        # Creates the button with the image stored
-        help_button = tk.Button(self, text="Help Button", image=photo, bg="grey",
-                                command=lambda: controller.show_frame(Help_Page))
-        # Removes the border on the button
-        help_button.config(border="0")
-        # Places the button in the bottom left corner
-        help_button.place(x=0, y=730)
-        # Sets the image of the button to be the photo
-        help_button.image = photo
-        # Alllows the user to go back to previous screen
         back_button = tk.Button(self, text="Back",
                                 command=lambda: controller.show_frame(Main_Menu))
         back_button.config(height=3, width=10, bg="blue", fg="white")
@@ -336,18 +316,6 @@ class Register2(tk.Frame):
         email_entry = tk.Entry(self, textvariable=self.controller.shared_data["email"])
         email_entry.grid(row=4, column=1)
 
-        # Stores the image of the button
-        photo = tk.PhotoImage(file="button.png")
-        # Creates the button with the image stored
-        help_button = tk.Button(self, text="Help Button", image=photo,
-                                command=lambda: controller.show_frame(Help_Page))
-        # Removes the border on the button
-        help_button.config(border="0",  bg="grey")
-        # Places the button in the bottom left corner
-        help_button.place(x=0, y=730)
-        # Sets the image of the button to be the photo
-        help_button.image = photo
-        # Terminates the whole program
         quit_button = tk.Button(self, text="Exit", command=lambda: quit(self))
         quit_button.config(fg="white", bg="blue", height=3, width=10)
         quit_button.place(x=1200, y=750)
@@ -379,7 +347,6 @@ class StudentArea(tk.Frame):
         tk.Frame.__init__(self, parent)
         tk.Frame.config(self, bg="grey")
         self.controller = controller
-        self.bind("<<ShowFrame>>", self.on_show_frame)
 
         label = tk.Label(self, text="Student Area", font=title_font)
         label.config(bg="blue", fg="white")
@@ -398,11 +365,13 @@ class StudentArea(tk.Frame):
         info_button.config(height=5, width=30, bg="blue", fg="white")
         info_button.place(x=750, y=450)
 
-        math_button1 = tk.Button(self, text="AS Maths")
+        math_button1 = tk.Button(self, text="AS Maths", command=lambda: [
+                                 controller.show_frame(entry_questions), self.change_AS()])
         math_button1.config(height=5, width=30, bg="blue", fg="white")
         math_button1.place(x=400, y=250)
 
-        math_button2 = tk.Button(self, text="A2 Maths")
+        math_button2 = tk.Button(self, text="A2 Maths", command=lambda: [
+                                 controller.show_frame(entry_questions), self.change_A2()])
         math_button2.config(height=5, width=30, bg="blue", fg="white")
         math_button2.place(x=750, y=250)
 
@@ -426,21 +395,6 @@ class StudentArea(tk.Frame):
         test_button.config(height=3, width=10, bg="blue", fg="white")
         test_button.place(x=100, y=650)
 
-    def on_show_frame(self, event):
-        print("setting variables")
-        if va.view_info(self.controller.shared_data["login_username"], self.controller.shared_data["School"]) is "S":
-            self.controller.update_widgets(
-                [ViewAccountInfo], "header", "text", va.header)
-            self.controller.update_widgets(
-                [ViewAccountInfo], "result", "text", va.result)
-            return True
-        elif va.view_info(self.controller.shared_data["login_username"], self.controller.shared_data["School"]) is "T":
-            print("Teacher")
-            self.controller.shared_data["header"] = va.header
-            self.controller.shared_data["details"] = va.result
-
-            return True
-
     def update_labels(self):
         va.view_info(self.controller.shared_data["login_username"],
                      self.controller.shared_data["School"])
@@ -448,6 +402,12 @@ class StudentArea(tk.Frame):
             [ViewAccountInfo], "header", "text", va.header)
         self.controller.update_widgets(
             [ViewAccountInfo], "result", "text", va.result)
+
+    def change_AS(self):
+        self.controller.shared_data["test_level"] = "AS"
+
+    def change_A2(self):
+        self.controller.shared_data["test_level"] = "A2"
 
 
 class TeacherArea(tk.Frame):
@@ -467,11 +427,12 @@ class TeacherArea(tk.Frame):
         account_info.config(height=5, width=30, bg="blue", fg="white")
         account_info.place(x=750, y=450)
 
-        student_class_information = tk.Button(self, text="View Student/Class Information")
+        student_class_information = tk.Button(
+            self, text="View Student/Class Information", command=lambda: controller.show_frame(StudentandClass))
         student_class_information.place(x=400, y=250)
         student_class_information.config(height=5, width=30, bg="blue", fg="white")
 
-        flagged_students = tk.Button(self, text="View Flagged Students")
+        flagged_students = tk.Button(self, text="Add Question")
         flagged_students.place(x=750, y=250)
         flagged_students.config(height=5, width=30, bg="blue", fg="white")
 
@@ -603,7 +564,7 @@ class Help_Page(tk.Frame):
         back_button.config(height=3, width=10, bg="blue")
         back_button.place(x=1050, y=750)
         support_text = (
-            "If you still have problems or which to recommend any updates you can email Maths Pro \n using the button below")
+            "If you still have problems or which to recommend any updates you can email Maths Pro \n using the button below leave your name if you want follow up help")
         support_label = tk.Label(self, text=support_text, font=small_font)
         support_label.config(bg="cyan")
         support_label.place(x=700, y=150)
@@ -680,10 +641,10 @@ class ViewAccountInfo(tk.Frame):
 
         self.w_result = None
 
-        self.header = tk.Label(self, text=self.w_header, font=title_font, bg="grey")
+        self.header = tk.Label(self, text=self.w_header, font=large_font, bg="grey")
         self.header.pack()
 
-        self.result = tk.Label(self, text=self.w_result, font=title_font, bg="grey")
+        self.result = tk.Label(self, text=self.w_result, font=large_font, bg="grey")
         self.result.pack()
 
         photo = tk.PhotoImage(file="button.png")
@@ -738,7 +699,7 @@ class SetTestDate(tk.Frame):
         separator = ttk.Separator(self, orient="vertical")
         separator.grid(row=1, column=3, rowspan=7, sticky="ns")
         # instruction text for username and password
-        guide = ("Enter test date, test type, test level and any other comments that you would like to add. \n Note: Date format should be YYYY/MM/DD, leaving a comment is optional")
+        guide = ("Enter test date, test type, test level and any other comments that you would like to add. \n Note: Date format should be YYYY-MM-DD, leaving a comment is optional")
         label_text = tk.Label(self, text=guide, font=small_font, bg="grey")
         label_text.grid(row=2, column=4)
 
@@ -799,14 +760,96 @@ class SetTestDate(tk.Frame):
             controller.show_frame(TeacherArea)
 
 
-class Questions(tk.Frame):
+class entry_questions(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        tk.Frame.config(self, bg="grey")
+        self.controller = controller
+
+        label = tk.Label(self, text="Questions", font=title_font, bg="grey")
+        label.grid(row=0, column=0)
+
+        intro_text = "Please choose the question loop to occur either a pure question loop aor stats question loop note the questions will have set answers \n and any rounding will be stated in the question"
+
+        guide = tk.Label(self, text=intro_text, bg="grey")
+        guide.grid(row=2, column=4)
+
+        separator = ttk.Separator(self, orient="vertical")
+        separator.grid(row=1, column=3, rowspan=7, sticky="ns")
+
+        type_label = tk.Label(self, text="Test Type", bg="grey")
+        type_label.grid(row=2, column=0)
+
+        tk.Radiobutton(self, text="Pure", padx=5,
+                       variable=self.controller.shared_data["test_type"], value=1, bg="grey").grid(row=2, column=1)
+        tk.Radiobutton(self, text="Applied", padx=5,
+                       variable=self.controller.shared_data["test_type"], value=2, bg="grey").grid(row=2, column=2)
+        start_button = tk.Button(self, text="Start", bg="grey")
+        start_button.config(bg="blue", fg="white", height=3, width=10)
+        start_button.grid(row=3, column=2)
+
+        back_button = tk.Button(self, text="Back",
+                                command=lambda: controller.show_frame(StudentArea))
+        back_button.config(height=3, width=10, bg="blue", fg="white")
+        back_button.place(x=1050, y=750)
+
+        quit_button = tk.Button(self, text="Exit", command=lambda: quit(self))
+        quit_button.config(height=3, width=10, bg="blue", fg="white")
+        quit_button.place(x=1200, y=750)
+
+
+class StudentandClass(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        tk.Frame.config(self, bg="grey")
+        self.controller = controller
+
+        label = tk.Label(self, text="Student and Class Info", font=title_font, bg="grey")
+        label.grid(row=0, column=0)
+
+        order_age = tk.Button(self, text="Order by Age",
+                              command=lambda: students.config(values=sc.sort_age()))
+        order_age.config(height=3, width=15, bg="blue", fg="white")
+        order_age.place(x=100, y=200)
+
+        order_class = tk.Button(self, text="Order by Class",
+                                command=lambda: students.config(values=sc.sort_class()))
+        order_class.config(height=3, width=15, bg="blue", fg="white")
+        order_class.place(x=300, y=200)
+
+        order_surname = tk.Button(self, text="Order by Surname",
+                                  command=lambda: students.config(values=sc.sort_surname()))
+        order_surname.config(height=3, width=15, bg="blue", fg="white")
+        order_surname.place(x=500, y=200)
+
+        order_gender = tk.Button(self, text="Order by Gender",
+                                 command=lambda: students.config(values=sc.sort_gender()))
+        order_gender.config(height=3, width=15, bg="blue", fg="white")
+        order_gender.place(x=700, y=200)
+
+        students = ttk.Combobox(self, values=sc.get_students(), state="readonly")
+        students.set("Please select a student")
+        students.config(height=5, width=50)
+        students.place(x=400, y=300)
+        students.bind("<<ComboboxSelected>>")
+
+        back_button = tk.Button(self, text="Back",
+                                command=lambda: [controller.show_frame(TeacherArea), students.set("Please select student ")])
+        back_button.config(height=3, width=10, bg="blue", fg="white")
+        back_button.place(x=1050, y=750)
+
+        quit_button = tk.Button(self, text="Exit", command=lambda: quit(self))
+        quit_button.config(height=3, width=10, bg="blue", fg="white")
+        quit_button.place(x=1200, y=750)
+
+
+class Add_Question(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         tk.Frame.config(self, bg="grey")
 
-        type_label = tk.Label(self, text="Test Type")
-
-        tk.Radiobutton(self, text="Pure", padx=5, self.controller.shared_data["Pure"], value=1)
+        title_label = tk.Label(self, bg="grey", font=title_font, text="Add Question")
+        title_label.grid(row=0, column=0)
 
 
 root = MathsPro()  # this runs the Maths Pro class

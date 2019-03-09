@@ -34,7 +34,9 @@ db.commit()  # saves changes made to the sql file
 
 def register1(firstname, surname, age, school_class, var, var1):  # Function for registration
     if firstname.isalpha() is True:
+        firstname.title()
         if surname.isalpha() is True:
+            surname.title()
             try:
                 age1 = int(age)
                 if school_class.isalnum() is True:

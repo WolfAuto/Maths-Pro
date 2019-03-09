@@ -101,6 +101,7 @@ def teacher_email(email):
 def support_email():
     support_window = tk.Tk()
     support_window.withdraw()
+    support_window.attributes("-topmost", True)
 
     yag = yagmail.SMTP("mathspro0@gmail.com", oauth2_file="~/oauth2_creds1.json")
 

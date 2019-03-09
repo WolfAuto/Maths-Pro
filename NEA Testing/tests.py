@@ -1,9 +1,10 @@
 import sqlite3 as sql
 import datetime as dt
 import tkinter as tk
-import pandas as pd 
+import pandas as pd
 from tkinter import messagebox
 from tkinter import ttk
+conn = sql.connect("updatedfile.db")
 with sql.connect("updatedfile.db", detect_types=sql.PARSE_DECLTYPES) as db:
     cursor = db.cursor()
     cursor1 = db.cursor()
@@ -17,21 +18,19 @@ create_date_table = (
 cursor.execute(create_date_table)
 
 title_font = ("Times New Roman", 30)
+medium_font = ("Times New Roman", 20)
 
 
 def show_details():
-    format_details()
     root = tk.Tk()
 
     title_label = tk.Label(root, text="Tests", font=title_font, bg="grey")
     title_label.pack()
 
-    current_label = tk.Label(root, text="Test For Today", bg="grey")
+    current_label = tk.Label(root, text="Test For Today", bg="grey", font=title_font)
     current_label.config(anchor="center")
     current_label.pack(pady=10)
-    header_label = tk.Label(root, text=today_header, bg="grey")
-    header_label.pack(pady=20)
-    today_label = tk.Label(root, text=today_result, bg="grey")
+    today_label = tk.Label(root, text=current_test(), bg="grey", font=medium_font)
     today_label.pack()
 
     separator = ttk.Separator(root, orient="horizontal")
@@ -40,74 +39,49 @@ def show_details():
     upcoming_label = tk.Label(root, text="Upcoming Tests", font=title_font, bg="grey")
     upcoming_label.pack()
 
-    header1_label = tk.Label(root, text=upcoming_header, bg="grey")
-    header1_label.pack()
-    test_upcoming = tk.Label(root, text=upcoming_result, bg="grey")
+    test_upcoming = tk.Label(root, text=upcoming_test(), bg="grey", font=medium_font)
     test_upcoming.pack(pady=20)
 
     exit_button = tk.Button(root, text="Exit", command=lambda: root.destroy())
     exit_button.config(height=3, width=10, bg="blue", fg="white")
-    exit_button.place(x=420, y=445)
-    
+    exit_button.place(x=920, y=445)
 
-    root.geometry("500x500+500-100")
+    refresh_button = tk.Button(root, text="Refresh Tests", command=lambda: [
+                               delete_date(), upcoming_test(), current_test()])
+    refresh_button.config(height=3, width=10, bg="blue", fg="white")
+    refresh_button.place(x=0, y=445)
+
+    root.geometry("1000x500+500-100")
     root.config(bg="grey")
+    root.attributes("-topmost", True)
     messagebox.showinfo("Window", "After you have finished with this window you can close it")
 
 
-def format_details():
-    format_upcoming()
-    format_current()
-    global upcoming_result
-    global today_result
-    upcoming_result = format_upcoming()
-    today_result = format_current()
+def upcoming_test():
+    sql = """ SELECT test_date,test_type,test_level,comments FROM test_dates WHERE test_date > ?  """
+    resp = pd.read_sql_query(sql, db, params=(current_date,))
+    if resp.empty:
+        return "No Test Today"
+    else:
+        return resp
 
 
-def format_upcoming():
-    get_details()
-    global upcoming_header
-    header = ("Test Date", "Test Type", "Test Level", "Comments")
-    widths = [len(cell) for cell in header]
-    for row in result:
-        for i, cell in enumerate(row):
-            widths[i] = max(len(str(cell)), widths[i])
-    formatted_row = '       '.join('{:%d}' % width for width in widths)
-    upcoming_header = formatted_row.format(*header)
-    for row in result:
-        print(formatted_row.format(*row))
+def current_test():
+    sql = """ SELECT test_date,test_type,test_level,comments FROM test_dates WHERE test_date = ?  """
+    resp = pd.read_sql_query(sql, db, params=(current_date,))
+    if resp.empty:
+        return "No Test Today"
+    else:
+        return resp
 
 
-def format_current():
-    global today_header
-    get_details()
-    current_form = []
-    header = ("Test Date", "Test Type", "Test Level", "Comments")
-    widths = [len(cell) for cell in header]
-    for row in current:
-        for i, cell in enumerate(row):
-            widths[i] = max(len(str(cell)), widths[i])
-    formatted_row = '        '.join('{:%d}' % width for width in widths)
-    today_header = formatted_row.format(*header)
-    for row in current:
-        print(formatted_row.format(*row))
-        
-
-
-def get_details():
-    global result
-    global current
-    today_date = (
-        "SELECT test_date,test_type,test_level,comments FROM test_dates WHERE test_date = ? ")
-    check_date = (
-        "SELECT test_date,test_type,test_level,comments FROM test_dates WHERE test_date > ? ")
-    cursor1.execute(check_date, [(current_date)])
-    cursor.execute(today_date, [(current_date)])
-    result = cursor.fetchall()
-    current = cursor1.fetchall()
+def update_stamp():
+    sql = """ UPDATE test_dates SET time_stamp = ? """
+    cursor.execute(sql, [(current_date)])
+    db.commit()
 
 
 def delete_date():
-    delete_date = ("DELETE FROM test_dates WHERE test_date < time_stamp")
+    delete_date = ("DELETE FROM test_dates WHERE time_stamp > test_date")
     cursor.execute(delete_date)
     db.commit()

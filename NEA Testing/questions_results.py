@@ -1,9 +1,7 @@
-import sqlite3 as sql
-import random
+
 from tkinter import messagebox
 import datetime as dt
-with sql.connect("updatedfile.db") as db:
-    cursor = db.cursor()
+from create_connection import *
 
 current_date = dt.date.today().strftime("%Y-%m-%d")
 create_result_table = """CREATE TABLE IF NOT EXISTS maths_result(maths_id INTEGER PRIMARY KEY , score INTEGER, correct_pure INTEGER, correct_applied INTEGER, incorrect_pure INTEGER, incorrect_applied INTEGER, time_stamp DATE)"""
@@ -13,48 +11,64 @@ cursor.execute(create_question_table)
 db.commit()
 
 
-def make_question(question_text, type, level):
+def make_question(question_text, type, level, answer):
     question_type = ""
     question_level = ""
     if question_text:
         if type is 1:
             question_type = "Pure"
             if level is 1:
-                question_level = "AS"
-                insert_question = (
-                    "INSERT INTO maths_questions(test_type, test_level, question) VALUES (?, ?, ?) ")
-                cursor.execute(insert_question, [(question_type),
-                                                 (question_level), (question_text)])
-                db.commit()
-                return True
+                if answer.isalnum() is True:
+                    question_level = "AS"
+                    insert_question = (
+                        "INSERT INTO maths_questions(test_type, test_level, question,answer) VALUES (?, ?, ?, ?) ")
+                    cursor.execute(insert_question, [(question_type),
+                                                     (question_level), (question_text), (answer)])
+                    db.commit()
+                    return True
+                else:
+                    messagebox.showerror(
+                        "Answer", "Answer cannot be left blank and no spaces in answer")
             elif level is 2:
-                question_level = "A2"
-                insert_question = (
-                    "INSERT INTO maths_questions(test_type, test_level, question) VALUES (?, ?, ?) ")
-                cursor.execute(insert_question, [(question_type),
-                                                 (question_level), (question_text)])
-                db.commit()
-                return True
+                if answer.isalnum() is True:
+                    question_level = "A2"
+                    insert_question = (
+                        "INSERT INTO maths_questions(test_type, test_level, question, answer) VALUES (?, ?, ?, ?) ")
+                    cursor.execute(insert_question, [(question_type),
+                                                     (question_level), (question_text), (answer)])
+                    db.commit()
+                    return True
+                else:
+                    messagebox.showerror(
+                        "Answer", "Answer cannot be left blank and no spaces in answer")
             else:
                 messagebox.showerror("Level", "Level cannot be left blank")
         elif type is 2:
             question_type = "Applied"
             if level is 1:
-                question_level = "AS"
-                insert_question = (
-                    "INSERT INTO maths_questions(test_type, test_level, question) VALUES (?, ?, ?) ")
-                cursor.execute(insert_question, [(question_type),
-                                                 (question_level), (question_text)])
-                db.commit()
-                return True
+                if answer.isalnum() is True:
+                    question_level = "AS"
+                    insert_question = (
+                        "INSERT INTO maths_questions(test_type, test_level, question, answer) VALUES (?, ?, ?, ?) ")
+                    cursor.execute(insert_question, [(question_type),
+                                                     (question_level), (question_text), (answer)])
+                    db.commit()
+                    return True
+                else:
+                    messagebox.showerror(
+                        "Answer", "Answer cannot be left blank and no spaces in answer")
             elif level is 2:
-                question_level = "A2"
-                insert_question = (
-                    "INSERT INTO maths_questions(test_type, test_level, question) VALUES (?, ?, ?) ")
-                cursor.execute(insert_question, [(question_type),
-                                                 (question_level), (question_text)])
-                db.commit()
-                return True
+                if answer.isalnum() is True:
+                    question_level = "A2"
+                    insert_question = (
+                        "INSERT INTO maths_questions(test_type, test_level, question, answer) VALUES (?, ?, ?, ?) ")
+                    cursor.execute(insert_question, [(question_type),
+                                                     (question_level), (question_text), (answer)])
+                    db.commit()
+                    return True
+                else:
+                    messagebox.showerror(
+                        "Answer", "Answer cannot be left blank and no spaces in answer")
             else:
                 messagebox.showerror("Level", "Level cannot be left blank")
         else:

@@ -1,13 +1,11 @@
-import sqlite3 as sql  # module for database connection
 from tkinter import messagebox  # module for error messages on the tkinter page
 import string
 import re
 import bcrypt
 from validate_email import validate_email
 import yagmail
-with sql.connect("updatedfile.db") as db:  # sets the connection to tbe database file
-    cursor = db.cursor()  # sets the cursor to allow sql statement execution
-    cursor1 = db.cursor()
+from create_connection import *
+
 shared_data = {"firstname": "blank",  # dictionary that stores the user register information
                "surname": "blank",    # through using the controller we can pass these variables
                "age": 0,        # to different frames

@@ -1,7 +1,4 @@
-import sqlite3 as sql
-
-with sql.connect("updatedfile.db") as db:
-    cursor = db.cursor()
+from create_connection import cursor
 
 
 def get_students():

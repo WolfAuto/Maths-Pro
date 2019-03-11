@@ -1,10 +1,12 @@
 import tkinter as tk
+import tkinter.scrolledtext as tkst
 from tkinter import ttk
 from tkinter import messagebox
 # this is import the functionailty of the registration from another python file
 from remake_register import register1, register2
 from test_dates import set_test, show_details
 from login_backend import login_in, forgot_password, support_email, back_button
+from questions_results import make_question
 import view_account as va
 import student_class as sc
 
@@ -40,8 +42,8 @@ class MathsPro(tk.Tk):
                             "comments": tk.StringVar(),
                             "test_type": tk.IntVar(),
                             "test_level": tk.StringVar(),
-                            "Pure Loop": None,
-                            "Applied Loop": None}
+                            "type": tk.IntVar(),
+                            "level": tk.IntVar()}
 
         tk.Tk.wm_title(self, "Maths Pro")  # Sets the title of each page to be Maths Pro
         container = tk.Frame(self)  # defined a container for all the frame be kept
@@ -54,7 +56,7 @@ class MathsPro(tk.Tk):
 
         self.frames = {}  # Empty dictionary where all the frames are kept
         # contains all the pages being used doesn't work without multiple frames (more than one)
-        for F in (Main_Menu, Register, Register2, StudentArea, TeacherArea, Help_Page, ViewAccountInfo, SetTestDate, entry_questions, StudentandClass):
+        for F in (Main_Menu, Register, Register2, StudentArea, TeacherArea, Help_Page, ViewAccountInfo, SetTestDate, entry_questions, StudentandClass, Add_Question):
 
             # Defines the frame from the for loop which contains all the pages
             frame = F(container, self)
@@ -68,7 +70,7 @@ class MathsPro(tk.Tk):
         # This allows the frame to be displayed and streched
         frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Main_Menu)  # sets the first frame to be shown is a register page
+        self.show_frame(Add_Question)  # sets the first frame to be shown is a register page
 
     def get_page(self, page_class):
         return self.frames[page_class]
@@ -432,7 +434,8 @@ class TeacherArea(tk.Frame):
         student_class_information.place(x=400, y=250)
         student_class_information.config(height=5, width=30, bg="blue", fg="white")
 
-        flagged_students = tk.Button(self, text="Add Question")
+        flagged_students = tk.Button(self, text="Add Question",
+                                     command=lambda: controller.show_frame(Add_Question))
         flagged_students.place(x=750, y=250)
         flagged_students.config(height=5, width=30, bg="blue", fg="white")
 
@@ -847,9 +850,56 @@ class Add_Question(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         tk.Frame.config(self, bg="grey")
+        self.controller = controller
 
         title_label = tk.Label(self, bg="grey", font=title_font, text="Add Question")
         title_label.grid(row=0, column=0)
+
+        question_label = tk.Label(self, bg="grey", font=small_font, text="Question")
+        question_label.grid(row=1, column=0)
+
+        question_entry = tkst.ScrolledText(self, height=5, width=30, wrap=tk.WORD)
+        question_entry.grid(row=1, column=1)
+
+        type_label = tk.Label(self, bg="grey", text="Test Type", font=small_font)
+        type_label.grid(row=2, column=0)
+
+        tk.Radiobutton(self, text="Pure", padx=5, bg="grey", value=1,
+                       variable=self.controller.shared_data["type"]).grid(row=2, column=1)
+        tk.Radiobutton(self, text="Applied", padx=5, bg="grey", value=2,
+                       variable=self.controller.shared_data["type"]).grid(row=2, column=2)
+        level_label = tk.Label(self, bg="grey", text="Test Level", font=small_font)
+        level_label.grid(row=3, column=0)
+
+        tk.Radiobutton(self, text="AS", padx=5, bg="grey", value=1,
+                       variable=self.controller.shared_data["level"]).grid(row=3, column=1)
+        tk.Radiobutton(self, text="A2", bg="grey", value=2,
+                       variable=self.controller.shared_data["level"]).grid(row=3, column=2)
+
+        answer_label = tk.Label(self, text="Answer", bg="grey", font=small_font)
+        answer_label.grid(row=4, column=0)
+
+        answer = tk.StringVar()
+        answer_entry = tk.Entry(self, textvariable=answer)
+        answer_entry.grid(row=4, column=1)
+
+        separator = ttk.Separator(self, orient="vertical")
+        separator.grid(row=1, column=3, rowspan=7, sticky="ns")
+
+        guide = "This allows you to create new questions for students the questions must have set answers \n and if the questions have more than one answer then separate using commas \n and if there is more than one anwser then the order of the answers must be given in the question "
+
+        intro_label = tk.Label(self, text=guide, bg="grey", font=("Times New Roman", 10))
+        intro_label.grid(row=2, column=4)
+
+        add_question = tk.Button(self, text="Add Question", command=lambda: [self.add_question(controller, question_entry.get(
+            "1.0", "end-1c"), self.controller.shared_data["type"].get(), self.controller.shared_data["level"].get(), answer.get()), question_entry.delete("1.0", "end")])
+        add_question.config(bg="blue", fg="white", height=3, width=10)
+        add_question.grid(row=5, column=2)
+
+    def add_question(self, controller, question_text, type, level, answer):
+        if make_question(question_text, type, level, answer) is True:
+            messagebox.showinfo("Question", "Question has been added into the database")
+            controller.show_frame(TeacherArea)
 
 
 root = MathsPro()  # this runs the Maths Pro class

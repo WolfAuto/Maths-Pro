@@ -1,13 +1,10 @@
-import sqlite3 as sql
 import bcrypt
 import yagmail
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import simpledialog
 from remake_register import password_check
-with sql.connect("updatedfile.db") as db:
-    cursor = db.cursor()
-    cursor1 = db.cursor()
+from create_connection import *
 
 
 def back_button(school):

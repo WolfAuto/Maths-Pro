@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import simpledialog
 from remake_register import password_check
-from create_connection import *
+from create_connection import cursor, cursor1, db
 
 
 def back_button(school):

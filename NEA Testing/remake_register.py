@@ -4,7 +4,7 @@ import re
 import bcrypt
 from validate_email import validate_email
 import yagmail
-from create_connection import *
+from create_connection import cursor, cursor1, db
 
 shared_data = {"firstname": "blank",  # dictionary that stores the user register information
                "surname": "blank",    # through using the controller we can pass these variables

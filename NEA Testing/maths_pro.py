@@ -3,6 +3,7 @@ import tkinter.scrolledtext as tkst
 from tkinter import ttk
 from tkinter import messagebox
 # this is import the functionailty of the registration from another python file
+from create_connection import cursor
 from remake_register import register1, register2
 from test_dates import set_test, show_details
 from login_backend import login_in, forgot_password, support_email, back_button
@@ -40,7 +41,7 @@ class MathsPro(tk.Tk):
                             "var_type": tk.IntVar(),
                             "var_level": tk.IntVar(),
                             "comments": tk.StringVar(),
-                            "test_type": tk.IntVar(),
+                            "test_type": tk.StringVar(),
                             "test_level": tk.StringVar(),
                             "type": tk.IntVar(),
                             "level": tk.IntVar()}
@@ -56,7 +57,7 @@ class MathsPro(tk.Tk):
 
         self.frames = {}  # Empty dictionary where all the frames are kept
         # contains all the pages being used doesn't work without multiple frames (more than one)
-        for F in (Main_Menu, Register, Register2, StudentArea, TeacherArea, Help_Page, ViewAccountInfo, SetTestDate, entry_questions, StudentandClass, Add_Question):
+        for F in (Main_Menu, Register, Register2, StudentArea, TeacherArea, Help_Page, ViewAccountInfo, SetTestDate, entry_questions, StudentandClass, Add_Question, Question_Loop):
 
             # Defines the frame from the for loop which contains all the pages
             frame = F(container, self)
@@ -70,7 +71,7 @@ class MathsPro(tk.Tk):
         # This allows the frame to be displayed and streched
         frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Add_Question)  # sets the first frame to be shown is a register page
+        self.show_frame(Main_Menu)  # sets the first frame to be shown is a register page
 
     def get_page(self, page_class):
         return self.frames[page_class]
@@ -784,9 +785,9 @@ class entry_questions(tk.Frame):
         type_label.grid(row=2, column=0)
 
         tk.Radiobutton(self, text="Pure", padx=5,
-                       variable=self.controller.shared_data["test_type"], value=1, bg="grey").grid(row=2, column=1)
+                       variable=self.controller.shared_data["test_type"], value="Pure", bg="grey").grid(row=2, column=1)
         tk.Radiobutton(self, text="Applied", padx=5,
-                       variable=self.controller.shared_data["test_type"], value=2, bg="grey").grid(row=2, column=2)
+                       variable=self.controller.shared_data["test_type"], value="Applied", bg="grey").grid(row=2, column=2)
         start_button = tk.Button(self, text="Start", bg="grey")
         start_button.config(bg="blue", fg="white", height=3, width=10)
         start_button.grid(row=3, column=2)
@@ -900,6 +901,58 @@ class Add_Question(tk.Frame):
         if make_question(question_text, type, level, answer) is True:
             messagebox.showinfo("Question", "Question has been added into the database")
             controller.show_frame(TeacherArea)
+
+
+class Question_Loop(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        tk.Frame.config(self, bg="grey")
+        self.controller = controller
+        title_label = tk.Label(self, text="Question Loop", bg="grey", font=title_font)
+        title_label.grid(row=0, column=0)
+
+        self.Qn = 1
+        self.quizScore = 0
+        self.correct = 0
+        self.incorrect = 0
+        self.question_answer = ""
+
+        self.record = tk.Label(self, text="", bg="grey", font=small_font)
+        self.record.place(x=295, y=200)
+
+        self.question = tk.Label(self, text="Hello ", bg="grey", font=small_font)
+        self.question.place(x=300, y=200)
+        self.answer = tk.Label(self, text="Enter answer here", bg="grey", font=small_font)
+        self.answer.place(x=500, y=450)
+        userinput = tk.StringVar()
+
+        self.entry = tk.Entry(self, textvariable=userinput)
+        self.entry.place(x=700, y=450)
+
+        self.check_answer = tk.Button(self, text="Confirm Anwser")
+        self.check_answer.config(bg="blue", fg="white", height=3, width=15)
+        self.check_answer.place(x=900, y=450)
+
+        self.update_question_number(
+            self.controller.shared_data["test_type"], self.controller.shared_data["test_level"])
+        self.update_question(
+            self.controller.shared_data["test_type"], self.controller.shared_data["test_level"])
+
+    def update_question_number(self, type, level):
+        query = "SELECT MAX(question_id) FROM maths_questions WHERE test_type=? AND test_level=?"
+        cursor.execute(query, [(type), (level)])
+        row = cursor.fetchone()
+
+        self.record["text"] = row[0]
+
+    def update_question(self, type, level):
+        query = "SELECT question,answer FROM maths_question WHERE question_id=? AND test_type=? AND test_level=?"
+        cursor.execute(query, [(self.Qn), (type), (level)])
+        row = cursor.fetchone()
+
+        self.question["text"] = row[0]
+
+        self.question_answer["text"] = row[1]
 
 
 root = MathsPro()  # this runs the Maths Pro class

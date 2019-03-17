@@ -4,8 +4,6 @@ from create_connection import cursor
 def view_info(user, school):
     global header
     global result
-    global header1
-    global result1
     header = ("Forename", "Surname", "Age", "Class")
     widths = [len(cell) for cell in header]
     result = "blank"

@@ -7,7 +7,7 @@ from create_connection import cursor
 from remake_register import register1, register2
 from test_dates import set_test, show_details
 from login_backend import login_in, forgot_password, support_email, back_button
-from questions_results import make_question
+from questions_results import make_question, get_question
 import view_account as va
 import student_class as sc
 
@@ -41,10 +41,11 @@ class MathsPro(tk.Tk):
                             "var_type": tk.IntVar(),
                             "var_level": tk.IntVar(),
                             "comments": tk.StringVar(),
-                            "test_type": tk.StringVar(),
+                            "test_type": tk.IntVar(),
                             "test_level": tk.StringVar(),
                             "type": tk.IntVar(),
-                            "level": tk.IntVar()}
+                            "level": tk.IntVar(),
+                            "answer": tk.StringVar()}
 
         tk.Tk.wm_title(self, "Maths Pro")  # Sets the title of each page to be Maths Pro
         container = tk.Frame(self)  # defined a container for all the frame be kept
@@ -359,8 +360,8 @@ class StudentArea(tk.Frame):
             self, text="Welcome Student please choose from the following", font=medium_font, bg="grey")
         info_text.place(x=350, y=100)
         account_button = tk.Button(self, text="View Account Infomation",
-                                   command=lambda: [controller.show_frame(ViewAccountInfo),
-                                                    self.update_labels()])
+                                   command=lambda: [self.update_labels(), controller.show_frame(ViewAccountInfo),
+                                                    ])
         account_button.config(height=5, width=30, bg="blue", fg="white")
         account_button.place(x=400, y=450)
 
@@ -680,14 +681,11 @@ class ViewAccountInfo(tk.Frame):
             controller.show_frame(TeacherArea)
 
     def on_show_frame(self, event):
-        print("setting variables")
 
         self.controller.update_widgets(
             [ViewAccountInfo], "header", "text", None)
         self.controller.update_widgets(
             [ViewAccountInfo], "result", "text", None)
-
-        return True
 
 
 class SetTestDate(tk.Frame):
@@ -785,9 +783,9 @@ class entry_questions(tk.Frame):
         type_label.grid(row=2, column=0)
 
         tk.Radiobutton(self, text="Pure", padx=5,
-                       variable=self.controller.shared_data["test_type"], value="Pure", bg="grey").grid(row=2, column=1)
+                       variable=self.controller.shared_data["test_type"], value=1, bg="grey").grid(row=2, column=1)
         tk.Radiobutton(self, text="Applied", padx=5,
-                       variable=self.controller.shared_data["test_type"], value="Applied", bg="grey").grid(row=2, column=2)
+                       variable=self.controller.shared_data["test_type"], value=2, bg="grey").grid(row=2, column=2)
         start_button = tk.Button(self, text="Start", bg="grey")
         start_button.config(bg="blue", fg="white", height=3, width=10)
         start_button.grid(row=3, column=2)
@@ -800,6 +798,11 @@ class entry_questions(tk.Frame):
         quit_button = tk.Button(self, text="Exit", command=lambda: quit(self))
         quit_button.config(height=3, width=10, bg="blue", fg="white")
         quit_button.place(x=1200, y=750)
+
+    def start_loop(self, controller, level, type):
+        question_answer = get_question(type, level)
+        self.controller.update_widgets([Question_Loop], "question", "text", question_answer[0])
+        self.controller.shared_data["answer"] = question_answer[1]
 
 
 class StudentandClass(tk.Frame):
@@ -892,6 +895,15 @@ class Add_Question(tk.Frame):
         intro_label = tk.Label(self, text=guide, bg="grey", font=("Times New Roman", 10))
         intro_label.grid(row=2, column=4)
 
+        back_button = tk.Button(self, text="Back",
+                                command=lambda: controller.show_frame(TeacherArea))
+        back_button.config(height=3, width=10, bg="blue", fg="white")
+        back_button.place(x=1050, y=750)
+
+        quit_button = tk.Button(self, text="Exit", command=lambda: quit(self))
+        quit_button.config(height=3, width=10, bg="blue", fg="white")
+        quit_button.place(x=1200, y=750)
+
         add_question = tk.Button(self, text="Add Question", command=lambda: [self.add_question(controller, question_entry.get(
             "1.0", "end-1c"), self.controller.shared_data["type"].get(), self.controller.shared_data["level"].get(), answer.get()), question_entry.delete("1.0", "end")])
         add_question.config(bg="blue", fg="white", height=3, width=10)
@@ -911,16 +923,12 @@ class Question_Loop(tk.Frame):
         title_label = tk.Label(self, text="Question Loop", bg="grey", font=title_font)
         title_label.grid(row=0, column=0)
 
-        self.Qn = 1
         self.quizScore = 0
         self.correct = 0
         self.incorrect = 0
         self.question_answer = ""
 
-        self.record = tk.Label(self, text="", bg="grey", font=small_font)
-        self.record.place(x=295, y=200)
-
-        self.question = tk.Label(self, text="Hello ", bg="grey", font=small_font)
+        self.question = tk.Label(self, text=" ", bg="grey", font=small_font)
         self.question.place(x=300, y=200)
         self.answer = tk.Label(self, text="Enter answer here", bg="grey", font=small_font)
         self.answer.place(x=500, y=450)
@@ -932,27 +940,6 @@ class Question_Loop(tk.Frame):
         self.check_answer = tk.Button(self, text="Confirm Anwser")
         self.check_answer.config(bg="blue", fg="white", height=3, width=15)
         self.check_answer.place(x=900, y=450)
-
-        self.update_question_number(
-            self.controller.shared_data["test_type"], self.controller.shared_data["test_level"])
-        self.update_question(
-            self.controller.shared_data["test_type"], self.controller.shared_data["test_level"])
-
-    def update_question_number(self, type, level):
-        query = "SELECT MAX(question_id) FROM maths_questions WHERE test_type=? AND test_level=?"
-        cursor.execute(query, [(type), (level)])
-        row = cursor.fetchone()
-
-        self.record["text"] = row[0]
-
-    def update_question(self, type, level):
-        query = "SELECT question,answer FROM maths_question WHERE question_id=? AND test_type=? AND test_level=?"
-        cursor.execute(query, [(self.Qn), (type), (level)])
-        row = cursor.fetchone()
-
-        self.question["text"] = row[0]
-
-        self.question_answer["text"] = row[1]
 
 
 root = MathsPro()  # this runs the Maths Pro class

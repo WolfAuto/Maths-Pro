@@ -1,4 +1,4 @@
-
+import pandas as pd
 from tkinter import messagebox
 import datetime as dt
 import random
@@ -12,6 +12,8 @@ cursor.execute(create_question_table)
 db.commit()
 
 question_store = []
+questions = []
+question_answers = []
 
 
 def make_question(question_text, type, level, answer):
@@ -87,12 +89,12 @@ def query(level, type):
     return result[0]
 
 
-def random_number(total):
-    data = random.sample(range(1, total+1), 1)
+def random_num(total):
+    data = random.sample(range(total), 1)
     running = True
 
     while running:
-        data = random.sample(range(1, total+1), 1)
+        data = random.sample(range(total), 1)
         if (data[0] in question_store) is False:
             question_store.append(data[0])
             return data[0]
@@ -102,20 +104,23 @@ def random_number(total):
             pass
 
 
-def get_question(self, type, level):
-    query = "SELECT COUNT(question_id) FROM maths_questions WHERE test_type=? AND test_level=?"
-    cursor.execute(query, [(type), (level)])
-    row = cursor.fetchone()
+def get_question(type, level):
+    query = "SELECT question,answer FROM maths_questions WHERE test_type = ? AND test_level = ?"
+    resp = pd.read_sql_query(query, db, params=((type), (level)))
 
-    return random_num(row[0])
+    query1 = "SELECT COUNT(question_id) FROM maths_questions WHERE test_type=? AND test_level=?"
+    cursor1.execute(query1, [(type), (level)])
+    total = cursor1.fetchone()[0]
+    rand_num = random_num(total)
+    if rand_num is not "stop":
+        return [resp["question"][rand_num], resp["Answer"][rand_num]]
+    else:
+        return ["No more Questions", "END"]
 
 
-def actual_question(self, type, level):
-    query = "SELECT question,answer FROM maths_question WHERE question_id=? AND test_type=? AND test_level=?"
-    cursor.execute(query, [(self.get_question(type, level)), (type), (level)])
-    row = cursor.fetchone()
-
-    return row[0], row[1]
+def start_loop(type, level):
+    a = get_question(type, level)
+    print(a[0], a[1])
 
 
 def end_loop(correct, incorrect, score, questions_wrong, total_questions):

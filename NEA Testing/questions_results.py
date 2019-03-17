@@ -106,7 +106,7 @@ def random_num(total):
 
 def get_question(type, level):
     query = "SELECT question,answer FROM maths_questions WHERE test_type = ? AND test_level = ?"
-    resp = pd.read_sql_query(query, db, params=((type), (level)))
+    resp = pd.read_sql_query(query, db, params=[(type), (level)])
 
     query1 = "SELECT COUNT(question_id) FROM maths_questions WHERE test_type=? AND test_level=?"
     cursor1.execute(query1, [(type), (level)])

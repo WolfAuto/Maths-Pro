@@ -3,7 +3,6 @@ import tkinter.scrolledtext as tkst
 from tkinter import ttk
 from tkinter import messagebox
 # this is import the functionailty of the registration from another python file
-from create_connection import cursor
 from remake_register import register1, register2
 from test_dates import set_test, show_details
 from login_backend import login_in, forgot_password, support_email, back_button
@@ -72,7 +71,7 @@ class MathsPro(tk.Tk):
         # This allows the frame to be displayed and streched
         frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Main_Menu)  # sets the first frame to be shown is a register page
+        self.show_frame(StudentArea)  # sets the first frame to be shown is a register page
 
     def get_page(self, page_class):
         return self.frames[page_class]
@@ -786,7 +785,8 @@ class entry_questions(tk.Frame):
                        variable=self.controller.shared_data["test_type"], value=1, bg="grey").grid(row=2, column=1)
         tk.Radiobutton(self, text="Applied", padx=5,
                        variable=self.controller.shared_data["test_type"], value=2, bg="grey").grid(row=2, column=2)
-        start_button = tk.Button(self, text="Start", bg="grey")
+        start_button = tk.Button(self, text="Start", bg="grey", command=lambda: [self.start_loop(
+            self.controller, self.controller.shared_data["test_type"].get(), self.controller.shared_data["test_level"]), controller.show_frame(Question_Loop)])
         start_button.config(bg="blue", fg="white", height=3, width=10)
         start_button.grid(row=3, column=2)
 
@@ -799,8 +799,12 @@ class entry_questions(tk.Frame):
         quit_button.config(height=3, width=10, bg="blue", fg="white")
         quit_button.place(x=1200, y=750)
 
-    def start_loop(self, controller, level, type):
-        question_answer = get_question(type, level)
+    def start_loop(self, controller, type, level):
+        if type is 1:
+            value = "Pure"
+        elif type is 2:
+            value = "Applied"
+        question_answer = get_question(value, level)
         self.controller.update_widgets([Question_Loop], "question", "text", question_answer[0])
         self.controller.shared_data["answer"] = question_answer[1]
 
@@ -929,7 +933,7 @@ class Question_Loop(tk.Frame):
         self.question_answer = ""
 
         self.question = tk.Label(self, text=" ", bg="grey", font=small_font)
-        self.question.place(x=300, y=200)
+        self.question.place(x=200, y=200)
         self.answer = tk.Label(self, text="Enter answer here", bg="grey", font=small_font)
         self.answer.place(x=500, y=450)
         userinput = tk.StringVar()

@@ -1,12 +1,13 @@
 import tkinter as tk
 import tkinter.scrolledtext as tkst
+import re
 from tkinter import ttk
 from tkinter import messagebox
 # this is import the functionailty of the registration from another python file
 from remake_register import register1, register2
 from test_dates import set_test, show_details
 from login_backend import login_in, forgot_password, support_email, back_button
-from questions_results import make_question, get_question
+from questions_results import make_question, get_question, compare_answers
 import view_account as va
 import student_class as sc
 
@@ -44,7 +45,9 @@ class MathsPro(tk.Tk):
                             "test_level": tk.StringVar(),
                             "type": tk.IntVar(),
                             "level": tk.IntVar(),
-                            "answer": tk.StringVar()}
+                            "answer": tk.StringVar(),
+                            "Loop": tk.StringVar(),
+                            "Loop_type": tk.StringVar()}
 
         tk.Tk.wm_title(self, "Maths Pro")  # Sets the title of each page to be Maths Pro
         container = tk.Frame(self)  # defined a container for all the frame be kept
@@ -802,8 +805,11 @@ class entry_questions(tk.Frame):
     def start_loop(self, controller, type, level):
         if type is 1:
             value = "Pure"
+            self.controller.shared_data["Loop"] = "Pure"
         elif type is 2:
             value = "Applied"
+            self.controller.shared_data["Loop"] = "Applied"
+        self.controller.shared_data["Loop_type"] = value
         question_answer = get_question(value, level)
         self.controller.update_widgets([Question_Loop], "question", "text", question_answer[0])
         self.controller.shared_data["answer"] = question_answer[1]
@@ -930,7 +936,6 @@ class Question_Loop(tk.Frame):
         self.quizScore = 0
         self.correct = 0
         self.incorrect = 0
-        self.question_answer = ""
 
         self.question = tk.Label(self, text=" ", bg="grey", font=small_font)
         self.question.place(x=200, y=200)
@@ -941,9 +946,34 @@ class Question_Loop(tk.Frame):
         self.entry = tk.Entry(self, textvariable=userinput)
         self.entry.place(x=700, y=450)
 
-        self.check_answer = tk.Button(self, text="Confirm Anwser")
+        self.check_answer = tk.Button(self, text="Confirm Anwser", command=lambda: [self.confirm_answer(
+            self.controller, str(self.entry.get()), self.controller.shared_data["answer"]), self.entry.delete(0, tk.END)])
         self.check_answer.config(bg="blue", fg="white", height=3, width=15)
         self.check_answer.place(x=900, y=450)
+
+    def confirm_answer(self, controller, user_answer, actual_answer):
+        print("user input")
+        print(user_answer)
+        print("Actual answer")
+        print(actual_answer)
+        if compare_answers(user_answer, actual_answer) is True:
+            messagebox.showinfo("Answer", "That is the correct answer")
+            self.correct = self.correct+1
+            self.quizScore = self.quizScore+5
+            question_answer = get_question(self.controller.shared_data["Loop_type"],
+                                           self.controller.shared_data["test_level"])
+            self.question["text"] = question_answer[0]
+            self.controller.shared_data["answer"] = question_answer[1]
+
+        elif compare_answers(user_answer, actual_answer) is False:
+            messagebox.showinfo("Answer", "That is the incorrect answer the answer is %s" %
+                                (self.controller.shared_data["answer"]))
+            self.incorrect = self.incorrect + 1
+            self.quizScore = self.quizScore-5
+            question_answer = get_question(
+                self.controller.shared_data["Loop_type"], self.controller.shared_data["test_level"])
+            self.question["text"] = question_answer[0]
+            self.controller.shared_data["answer"] = question_answer[1]
 
 
 root = MathsPro()  # this runs the Maths Pro class

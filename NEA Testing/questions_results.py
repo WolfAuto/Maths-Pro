@@ -2,6 +2,8 @@ import pandas as pd
 from tkinter import messagebox
 import datetime as dt
 import random
+import re
+
 from create_connection import cursor, cursor1, db
 
 current_date = dt.date.today().strftime("%Y-%m-%d")
@@ -118,9 +120,24 @@ def get_question(type, level):
         return ["No more Questions", "END"]
 
 
-def start_loop(type, level):
-    a = get_question(type, level)
-    print(a[0], a[1])
+def question_answers(check1, check2):
+    if check1.find(",") is not -1:
+        mylist = check1.split(",")
+        mylist.sort(key=int)
+        check1 = ",".join(mylist)
+        answers = zip(check1, check2)
+        incorrect = len([c for c, d in answers if c != d])
+        if incorrect is 0:
+            return True
+        else:
+            return False
+    else:
+        answers = zip(check1, check2)
+        incorrect = len([c for c, d in answers if c != d])
+        if incorrect is 0:
+            return True
+        else:
+            return False
 
 
 def end_loop(correct, incorrect, score, questions_wrong, total_questions):

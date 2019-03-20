@@ -2,7 +2,6 @@ import pandas as pd
 from tkinter import messagebox
 import datetime as dt
 import random
-import re
 
 from create_connection import cursor, cursor1, db
 
@@ -120,25 +119,21 @@ def get_question(type, level):
         return ["No more Questions", "END"]
 
 
-def question_answers(check1, check2):
-    if check1.find(",") is not -1:
-        mylist = check1.split(",")
+def compare_answers(user_input, actual_answer):
+    if user_input.find(",") is not -1:
+        mylist = user_input.split(",")
         mylist.sort(key=int)
-        check1 = ",".join(mylist)
-        answers = zip(check1, check2)
-        incorrect = len([c for c, d in answers if c != d])
-        if incorrect is 0:
+        user_input = ",".join(mylist)
+        if str(user_input) == str(actual_answer):
             return True
         else:
             return False
     else:
-        answers = zip(check1, check2)
-        incorrect = len([c for c, d in answers if c != d])
-        if incorrect is 0:
+        if str(user_input) == str(actual_answer):
             return True
         else:
             return False
 
 
 def end_loop(correct, incorrect, score, questions_wrong, total_questions):
-    print("hello")
+    sql = "UPDATE maths_result SET score=?,correct_pure = ?, correct_applied=? , incorrect_pure=?, incorrect_applied=? WHERE id=? AND time_stamp = ?"

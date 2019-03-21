@@ -6,8 +6,10 @@ import random
 from create_connection import cursor, cursor1, db
 
 current_date = dt.date.today().strftime("%Y-%m-%d")
-create_result_table = """CREATE TABLE IF NOT EXISTS maths_result(maths_id INTEGER PRIMARY KEY , score INTEGER, correct_pure INTEGER, correct_applied INTEGER, incorrect_pure INTEGER, incorrect_applied INTEGER, time_stamp DATE)"""
-cursor.execute(create_result_table)
+create_pure_table = """CREATE TABLE IF NOT EXISTS pure_results(maths_id INTEGER PRIMARY KEY, level TEXT , score INTEGER ,total_questions INTEGER, correct_pure INTEGER, incorrect_pure INTEGER,  time_stamp DATE)"""
+create_applied_table = """CREATE TABLE IF NOT EXISTS applied_results(maths_id INTEGER PRIMARY KEY, level TEXT , score INTEGER ,total_questions INTEGER,  correct_applied INTEGER, incorrect_applied INTEGER, time_stamp DATE)"""
+cursor.execute(create_pure_table)
+cursor.execute(create_applied_table)
 create_question_table = """CREATE TABLE IF NOT EXISTS maths_questions(question_id INTEGER PRIMARY KEY, test_type TEXT,test_level TEXT, question TEXT, answer TEXT) """
 cursor.execute(create_question_table)
 db.commit()
@@ -83,13 +85,6 @@ def make_question(question_text, type, level, answer):
         messagebox.showerror("Question", "Question cannot be left blank")
 
 
-def query(level, type):
-    sql = """ SELECT COUNT(question_id) FROM maths_questions WHERE test_type=? AND test_level = ?"""
-    cursor.execute(sql, [(type), (level)])
-    result = cursor.fetchone()
-    return result[0]
-
-
 def random_num(total):
     data = random.sample(range(total), 1)
     running = True
@@ -135,5 +130,32 @@ def compare_answers(user_input, actual_answer):
             return False
 
 
-def end_loop(correct, incorrect, score, questions_wrong, total_questions):
-    sql = "UPDATE maths_result SET score=?,correct_pure = ?, correct_applied=? , incorrect_pure=?, incorrect_applied=? WHERE id=? AND time_stamp = ?"
+def get_student(username):
+    sql = "SELECT ID FROM Students WHERE username = ? "
+    cursor.execute(sql, [(username)])
+    return cursor.fetchone()[0]
+
+
+def end_loop(loop, user, correct, incorrect, score, level):
+    if (correct and incorrect and score) == 0:
+        return "No questions answered"
+    else:
+
+        id = get_student(user)
+
+        total = len(question_store)
+        if loop is "Pure":
+            sql = "INSERT INTO pure_results (maths_id,level, score, correct_pure, incorrect_pure,total_questions, time_stamp) VALUES (?, ?, ?, ?, ?, ?,?) "
+            cursor.execute(sql, [(id), (level), (score), (correct),
+                                 (incorrect), (total), (current_date)])
+            db.commit()
+            return True
+
+        elif loop is "Applied":
+            sql = "INSERT INTO applied_results (maths_id,level, score, correct_pure, incorrect_pure,total_questions, time_stamp) VALUES (?, ?, ?, ?, ?, ?,?) "
+            cursor.execute(sql, [(id), (level), (score), (correct),
+                                 (incorrect), (total), (current_date)])
+            db.commit()
+            return True
+        else:
+            return "Error"

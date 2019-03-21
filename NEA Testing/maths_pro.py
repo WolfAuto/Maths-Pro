@@ -7,7 +7,7 @@ from tkinter import messagebox
 from remake_register import register1, register2
 from test_dates import set_test, show_details
 from login_backend import login_in, forgot_password, support_email, back_button
-from questions_results import make_question, get_question, compare_answers
+from questions_results import make_question, get_question, compare_answers, end_loop
 import view_account as va
 import student_class as sc
 
@@ -74,7 +74,7 @@ class MathsPro(tk.Tk):
         # This allows the frame to be displayed and streched
         frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(StudentArea)  # sets the first frame to be shown is a register page
+        self.show_frame(Main_Menu)  # sets the first frame to be shown is a register page
 
     def get_page(self, page_class):
         return self.frames[page_class]
@@ -933,6 +933,8 @@ class Question_Loop(tk.Frame):
         title_label = tk.Label(self, text="Question Loop", bg="grey", font=title_font)
         title_label.grid(row=0, column=0)
 
+        self.total = 0
+
         self.quizScore = 0
         self.correct = 0
         self.incorrect = 0
@@ -951,13 +953,24 @@ class Question_Loop(tk.Frame):
         self.check_answer.config(bg="blue", fg="white", height=3, width=15)
         self.check_answer.place(x=900, y=450)
 
+        back_button = tk.Button(self, text="End Loop",
+                                command=lambda: self.store_results(controller, self.controller.shared_data["Loop"], self.controller.shared_data["login_username"], self.correct, self.incorrect, self.quizScore, self.controller.shared_data["test_level"]))
+        back_button.config(height=3, width=10, bg="blue", fg="white")
+        back_button.place(x=1050, y=750)
+
+    def store_results(self, controller, loop,  user,  correct, incorrect, score, level):
+        if end_loop(loop, user, correct, incorrect, score, level) is True:
+            messagebox.showinfo(
+                "Result", "Your Result of questions attempted is correct: %s, incorrect %s, score: %s, total_questions %s " % (self.correct, self.incorrect, self.quizScore, self.total))
+            controller.show_frame(StudentArea)
+        elif end_loop(loop, user, correct, incorrect, score, level) == "No questions answered":
+            messagebox.showinfo("Result", "No questions attempted")
+            controller.show_frame(StudentArea)
+
     def confirm_answer(self, controller, user_answer, actual_answer):
-        print("user input")
-        print(user_answer)
-        print("Actual answer")
-        print(actual_answer)
         if compare_answers(user_answer, actual_answer) is True:
             messagebox.showinfo("Answer", "That is the correct answer")
+            self.total = self.total + 1
             self.correct = self.correct+1
             self.quizScore = self.quizScore+5
             question_answer = get_question(self.controller.shared_data["Loop_type"],
@@ -968,6 +981,7 @@ class Question_Loop(tk.Frame):
         elif compare_answers(user_answer, actual_answer) is False:
             messagebox.showinfo("Answer", "That is the incorrect answer the answer is %s" %
                                 (self.controller.shared_data["answer"]))
+            self.total = self.total + 1
             self.incorrect = self.incorrect + 1
             self.quizScore = self.quizScore-5
             question_answer = get_question(

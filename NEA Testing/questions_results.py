@@ -6,8 +6,8 @@ import random
 from create_connection import cursor, cursor1, db
 
 current_date = dt.date.today().strftime("%Y-%m-%d")
-create_pure_table = """CREATE TABLE IF NOT EXISTS pure_results(maths_id INTEGER PRIMARY KEY, level TEXT , score INTEGER ,total_questions INTEGER, correct_pure INTEGER, incorrect_pure INTEGER,  time_stamp DATE)"""
-create_applied_table = """CREATE TABLE IF NOT EXISTS applied_results(maths_id INTEGER PRIMARY KEY, level TEXT , score INTEGER ,total_questions INTEGER,  correct_applied INTEGER, incorrect_applied INTEGER, time_stamp DATE)"""
+create_pure_table = """CREATE TABLE IF NOT EXISTS pure_results(maths_id INTEGER, user_id INTEGER , level TEXT , score INTEGER ,total_questions INTEGER, correct_pure INTEGER, incorrect_pure INTEGER,  time_stamp DATE, FOREIGN KEY (user_id) REFERENCES Students(ID))"""
+create_applied_table = """CREATE TABLE IF NOT EXISTS applied_results(maths_id INTEGER PRIMARY KEY, user_id INTEGER, level TEXT , score INTEGER ,total_questions INTEGER,  correct_applied INTEGER, incorrect_applied INTEGER, time_stamp DATE, FOREIGN KEY (user_id) REFERENCES Students(ID))"""
 cursor.execute(create_pure_table)
 cursor.execute(create_applied_table)
 create_question_table = """CREATE TABLE IF NOT EXISTS maths_questions(question_id INTEGER PRIMARY KEY, test_type TEXT,test_level TEXT, question TEXT, answer TEXT) """
@@ -15,8 +15,6 @@ cursor.execute(create_question_table)
 db.commit()
 
 question_store = []
-questions = []
-question_answers = []
 
 
 def make_question(question_text, type, level, answer):
@@ -136,14 +134,14 @@ def get_student(username):
     return cursor.fetchone()[0]
 
 
-def end_loop(loop, user, correct, incorrect, score, level):
+def end_loop(loop, user, correct, incorrect, score, level, total):
+    question_store.clear()
     if (correct and incorrect and score) == 0:
         return "No questions answered"
     else:
 
         id = get_student(user)
 
-        total = len(question_store)
         if loop is "Pure":
             sql = "INSERT INTO pure_results (maths_id,level, score, correct_pure, incorrect_pure,total_questions, time_stamp) VALUES (?, ?, ?, ?, ?, ?,?) "
             cursor.execute(sql, [(id), (level), (score), (correct),

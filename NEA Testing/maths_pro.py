@@ -954,12 +954,12 @@ class Question_Loop(tk.Frame):
         self.check_answer.place(x=900, y=450)
 
         back_button = tk.Button(self, text="End Loop",
-                                command=lambda: self.store_results(controller, self.controller.shared_data["Loop"], self.controller.shared_data["login_username"], self.correct, self.incorrect, self.quizScore, self.controller.shared_data["test_level"]))
+                                command=lambda: self.store_results(controller, self.controller.shared_data["Loop"], self.controller.shared_data["login_username"], self.correct, self.incorrect, self.quizScore, self.controller.shared_data["test_level"],self.total))
         back_button.config(height=3, width=10, bg="blue", fg="white")
         back_button.place(x=1050, y=750)
 
-    def store_results(self, controller, loop,  user,  correct, incorrect, score, level):
-        if end_loop(loop, user, correct, incorrect, score, level) is True:
+    def store_results(self, controller, loop,  user,  correct, incorrect, score, level,total):
+        if end_loop(loop, user, correct, incorrect, score, level,total) is True:
             messagebox.showinfo(
                 "Result", "Your Result of questions attempted is correct: %s, incorrect %s, score: %s, total_questions %s " % (self.correct, self.incorrect, self.quizScore, self.total))
             controller.show_frame(StudentArea)

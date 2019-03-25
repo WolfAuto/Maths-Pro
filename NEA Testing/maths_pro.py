@@ -803,16 +803,20 @@ class entry_questions(tk.Frame):
         quit_button.place(x=1200, y=750)
 
     def start_loop(self, controller, type, level):
-        if type is 1:
-            value = "Pure"
-            self.controller.shared_data["Loop"] = "Pure"
-        elif type is 2:
-            value = "Applied"
-            self.controller.shared_data["Loop"] = "Applied"
-        self.controller.shared_data["Loop_type"] = value
-        question_answer = get_question(value, level)
-        self.controller.update_widgets([Question_Loop], "question", "text", question_answer[0])
-        self.controller.shared_data["answer"] = question_answer[1]
+        if type is 1 or type is 2:
+
+            if type is 1:
+                value = "Pure"
+                self.controller.shared_data["Loop"] = "Pure"
+            elif type is 2:
+                value = "Applied"
+                self.controller.shared_data["Loop"] = "Applied"
+            self.controller.shared_data["Loop_type"] = value
+            question_answer = get_question(value, level)
+            self.controller.update_widgets([Question_Loop], "question", "text", question_answer[0])
+            self.controller.shared_data["answer"] = question_answer[1]
+        else:
+            messagebox.showerror("Questions", "Please choose ither Pure or Applied")
 
 
 class StudentandClass(tk.Frame):
@@ -940,7 +944,7 @@ class Question_Loop(tk.Frame):
         self.incorrect = 0
 
         self.question = tk.Label(self, text=" ", bg="grey", font=small_font)
-        self.question.place(x=200, y=200)
+        self.question.place(x=0, y=200)
         self.answer = tk.Label(self, text="Enter answer here", bg="grey", font=small_font)
         self.answer.place(x=500, y=450)
         userinput = tk.StringVar()
@@ -953,18 +957,19 @@ class Question_Loop(tk.Frame):
         self.check_answer.config(bg="blue", fg="white", height=3, width=15)
         self.check_answer.place(x=900, y=450)
 
-        back_button = tk.Button(self, text="End Loop",
-                                command=lambda: self.store_results(controller, self.controller.shared_data["Loop"], self.controller.shared_data["login_username"], self.correct, self.incorrect, self.quizScore, self.controller.shared_data["test_level"],self.total))
-        back_button.config(height=3, width=10, bg="blue", fg="white")
-        back_button.place(x=1050, y=750)
+        end_button = tk.Button(self, text="End Loop",
+                               command=lambda: self.store_results(controller, self.controller.shared_data["Loop"], self.controller.shared_data["login_username"], self.correct, self.incorrect, self.quizScore, self.controller.shared_data["test_level"], self.total))
+        end_button.config(height=3, width=10, bg="blue", fg="white")
+        end_button.place(x=1050, y=750)
 
-    def store_results(self, controller, loop,  user,  correct, incorrect, score, level,total):
-        if end_loop(loop, user, correct, incorrect, score, level,total) is True:
-            messagebox.showinfo(
-                "Result", "Your Result of questions attempted is correct: %s, incorrect %s, score: %s, total_questions %s " % (self.correct, self.incorrect, self.quizScore, self.total))
+    def store_results(self, controller, loop,  user,  correct, incorrect, score, level, total):
+        if end_loop(loop, user, correct, incorrect, score, level, total) is True:
+            messagebox.showinfo("Results", "End of Questions Result are correct: %s, incorrect: %s, score: %s, total: %s" % (
+                self.correct, self.incorrect, self.quizScore, self.total))
+            self.total = 0
             controller.show_frame(StudentArea)
-        elif end_loop(loop, user, correct, incorrect, score, level) == "No questions answered":
-            messagebox.showinfo("Result", "No questions attempted")
+        elif end_loop(loop, user, correct, incorrect, score, level, total) is False:
+            messagebox.showinfo("Questions", "No Questions attempted")
             controller.show_frame(StudentArea)
 
     def confirm_answer(self, controller, user_answer, actual_answer):
@@ -979,15 +984,19 @@ class Question_Loop(tk.Frame):
             self.controller.shared_data["answer"] = question_answer[1]
 
         elif compare_answers(user_answer, actual_answer) is False:
-            messagebox.showinfo("Answer", "That is the incorrect answer the answer is %s" %
-                                (self.controller.shared_data["answer"]))
-            self.total = self.total + 1
-            self.incorrect = self.incorrect + 1
-            self.quizScore = self.quizScore-5
             question_answer = get_question(
                 self.controller.shared_data["Loop_type"], self.controller.shared_data["test_level"])
             self.question["text"] = question_answer[0]
             self.controller.shared_data["answer"] = question_answer[1]
+            if self.controller.shared_data["answer"] == "END":
+                messagebox.showinfo(
+                    "Questions", "End of questions press end loop to leave the page")
+            else:
+                messagebox.showinfo("Answer", "That is the incorrect answer the answer is %s" %
+                                    (self.controller.shared_data["answer"]))
+                self.total = self.total + 1
+                self.incorrect = self.incorrect + 1
+                self.quizScore = self.quizScore-5
 
 
 root = MathsPro()  # this runs the Maths Pro class

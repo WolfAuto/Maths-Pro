@@ -1,0 +1,11 @@
+1. First Fetch data from database
+2. Append Data to list in date order
+3. Checks for duplicate dates
+4. If there are duplicate dates it merges the two items as one (appending into the dates list
+as one and updating the value in the other list)
+5. Otherwise it just adds the value into the list 
+6. Steps 4 and 5 are continued until the list is iterated throug
+7. Two new lists are made one with the dates the other with value (correct, incorrect, etc.)
+8. Graph is plotted with a specific style plus other features
+9. Completed function 
+10. 

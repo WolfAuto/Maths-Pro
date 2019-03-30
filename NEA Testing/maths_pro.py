@@ -999,6 +999,12 @@ class Question_Loop(tk.Frame):
                 self.quizScore = self.quizScore-5
 
 
+class MathsInfo(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Fram.__init__(self,parent)
+        tk.Frame.config(bg="grey")
+
+
 root = MathsPro()  # this runs the Maths Pro class
 root.geometry("1280x800+150-50")  # changes the size of the window
 root.resizable(width=False, height=False)  # Prevents the root size from being changed

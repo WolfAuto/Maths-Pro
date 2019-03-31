@@ -1023,17 +1023,17 @@ class MathsInfo(tk.Frame):
         title_label.grid(row=0, column=0)
 
         correct_results = tk.Button(self, text="Display Correct Results", command=lambda: graph_correct(
-            self.controller.shared_data["login_username"]))
+            self.controller.shared_data["student_firstname"], self.contrller.shared_data["student_surname"]))
         correct_results.config(height=3, width=15, bg="blue", fg="white")
         correct_results.place(x=100, y=200)
 
         incorrect_results = tk.Button(self, text="Display Incorrect Results", command=lambda: graph_incorrect(
-            self.controller.shared_data["login_username"]))
+            self.controller.shared_data["student_firstname"], self.contrller.shared_data["student_surname"]))
         incorrect_results.config(height=3, width=15, bg="blue", fg="white")
         incorrect_results.place(x=300, y=200)
 
         total_results = tk.Button(self, text="Display Total Questions Results", command=lambda: graph_total_questions(
-            self.controller.shared_data["login_username"]))
+            self.controller.shared_data["student_firstname"], self.contrller.shared_data["student_surname"]))
         total_results.config(height=3, width=15, bg="blue", fg="white")
         total_results.place(x=500, y=200)
 

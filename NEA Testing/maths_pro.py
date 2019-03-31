@@ -8,6 +8,7 @@ from remake_register import register1, register2
 from test_dates import set_test, show_details
 from login_backend import login_in, forgot_password, support_email, back_button
 from questions_results import make_question, get_question, compare_answers, end_loop
+from creating_graphs import graph_correct, graph_incorrect, graph_total_questions, total_score
 import view_account as va
 import student_class as sc
 
@@ -47,7 +48,9 @@ class MathsPro(tk.Tk):
                             "level": tk.IntVar(),
                             "answer": tk.StringVar(),
                             "Loop": tk.StringVar(),
-                            "Loop_type": tk.StringVar()}
+                            "Loop_type": tk.StringVar(),
+                            "student_firstname": tk.StringVar(),
+                            "student_surname": tk.StringVar()}
 
         tk.Tk.wm_title(self, "Maths Pro")  # Sets the title of each page to be Maths Pro
         container = tk.Frame(self)  # defined a container for all the frame be kept
@@ -60,7 +63,7 @@ class MathsPro(tk.Tk):
 
         self.frames = {}  # Empty dictionary where all the frames are kept
         # contains all the pages being used doesn't work without multiple frames (more than one)
-        for F in (Main_Menu, Register, Register2, StudentArea, TeacherArea, Help_Page, ViewAccountInfo, SetTestDate, entry_questions, StudentandClass, Add_Question, Question_Loop):
+        for F in (Main_Menu, Register, Register2, StudentArea, TeacherArea, Help_Page, ViewAccountInfo, SetTestDate, entry_questions, StudentandClass, Add_Question, Question_Loop, MathsInfo):
 
             # Defines the frame from the for loop which contains all the pages
             frame = F(container, self)
@@ -74,7 +77,7 @@ class MathsPro(tk.Tk):
         # This allows the frame to be displayed and streched
         frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Main_Menu)  # sets the first frame to be shown is a register page
+        self.show_frame(StudentandClass)  # sets the first frame to be shown is a register page
 
     def get_page(self, page_class):
         return self.frames[page_class]
@@ -367,7 +370,8 @@ class StudentArea(tk.Frame):
         account_button.config(height=5, width=30, bg="blue", fg="white")
         account_button.place(x=400, y=450)
 
-        info_button = tk.Button(self, text="View Maths Information")
+        info_button = tk.Button(self, text="View Maths Information", command=lambda: [
+                                self.score_label(), controller.show_frame(MathsInfo)])
         info_button.config(height=5, width=30, bg="blue", fg="white")
         info_button.place(x=750, y=450)
 
@@ -414,6 +418,10 @@ class StudentArea(tk.Frame):
 
     def change_A2(self):
         self.controller.shared_data["test_level"] = "A2"
+
+    def score_label(self):
+        self.controller.update_widgets([MathsInfo], "score_result", total_score(
+            self.controller.shared_data["login_username"]))
 
 
 class TeacherArea(tk.Frame):
@@ -848,11 +856,12 @@ class StudentandClass(tk.Frame):
         order_gender.config(height=3, width=15, bg="blue", fg="white")
         order_gender.place(x=700, y=200)
 
-        students = ttk.Combobox(self, values=sc.get_students(), state="readonly")
-        students.set("Please select a student")
-        students.config(height=5, width=50)
-        students.place(x=400, y=300)
-        students.bind("<<ComboboxSelected>>")
+        self.students = ttk.Combobox(self, values=sc.get_students(),
+                                     state="readonly")
+        self.students.set("Please select a student")
+        self.students.config(height=5, width=50)
+        self.students.place(x=400, y=300)
+        self.students.bind("<<ComboboxSelected>>", self.student_find)
 
         back_button = tk.Button(self, text="Back",
                                 command=lambda: [controller.show_frame(TeacherArea), students.set("Please select student ")])
@@ -862,6 +871,12 @@ class StudentandClass(tk.Frame):
         quit_button = tk.Button(self, text="Exit", command=lambda: quit(self))
         quit_button.config(height=3, width=10, bg="blue", fg="white")
         quit_button.place(x=1200, y=750)
+
+    def student_find(self, event, controller):
+        print(self.students.get())
+        self.controller.shared_data["student_firstname"] = self.students.get()[1]
+        self.controler.shared_data["student_surname"] = self.students.get()[2]
+        controller.show_frame(MathsInfo)
 
 
 class Add_Question(tk.Frame):
@@ -1001,8 +1016,46 @@ class Question_Loop(tk.Frame):
 
 class MathsInfo(tk.Frame):
     def __init__(self, parent, controller):
-        tk.Fram.__init__(self,parent)
-        tk.Frame.config(bg="grey")
+        tk.Frame.__init__(self, parent)
+        tk.Frame.config(self, bg="grey")
+        self.controller = controller
+        title_label = tk.Label(self, text="Maths Info", font=title_font, bg="grey")
+        title_label.grid(row=0, column=0)
+
+        correct_results = tk.Button(self, text="Display Correct Results", command=lambda: graph_correct(
+            self.controller.shared_data["login_username"]))
+        correct_results.config(height=3, width=15, bg="blue", fg="white")
+        correct_results.place(x=100, y=200)
+
+        incorrect_results = tk.Button(self, text="Display Incorrect Results", command=lambda: graph_incorrect(
+            self.controller.shared_data["login_username"]))
+        incorrect_results.config(height=3, width=15, bg="blue", fg="white")
+        incorrect_results.place(x=300, y=200)
+
+        total_results = tk.Button(self, text="Display Total Questions Results", command=lambda: graph_total_questions(
+            self.controller.shared_data["login_username"]))
+        total_results.config(height=3, width=15, bg="blue", fg="white")
+        total_results.place(x=500, y=200)
+
+        score_label = tk.Label(self, text="Score", bg="grey")
+        score_label.place(x=300, y=500)
+        self.score_result = tk.Label(self, text="", bg="grey", font=medium_font)
+        self.score_result.place(x=300, y=600)
+
+        back_button = tk.Button(self, text="Back",
+                                command=lambda: self.changing_frame(controller, self.controller.shared_data["School"]))
+        back_button.config(height=3, width=10, bg="blue", fg="white")
+        back_button.place(x=1050, y=750)
+
+        quit_button = tk.Button(self, text="Exit", command=lambda: quit(self))
+        quit_button.config(height=3, width=10, bg="blue", fg="white")
+        quit_button.place(x=1200, y=750)
+
+    def changing_frame(self, controller, school):
+        if back_button(school) is "S":
+            controller.show_frame(StudentArea)
+        elif back_button(school) is "T":
+            controller.show_frame(TeacherArea)
 
 
 root = MathsPro()  # this runs the Maths Pro class

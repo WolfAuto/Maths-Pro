@@ -1,9 +1,15 @@
 from create_connection import cursor, cursor1, db
+from questions_results import get_student
 import matplotlib.pyplot as plt
+import pandas as pd
 plt.style.use(["bmh", "seaborn-talk"])
 
-
-def graph_correct(user_id):
+def get_student(firstname,surname):
+    sql = "SELECT ID FROM Students WHERE Forename = ? AND Surname = ?"
+    cursor.execute(sql , [(firstname), (surname)])
+    return cursor.fetchone()[0]
+def graph_correct(firstname,surname):
+    user_id = get_student(firstname,surname)
     dates_pure = []
     correct_pure = []
     dates_applied = []
@@ -33,7 +39,8 @@ def graph_correct(user_id):
     plt.show()
 
 
-def graph_incorrect(user_id):
+def graph_incorrect(firstname,surname):
+    user_id = get_student(firstname,surname)
     dates_pure = []
     incorrect_pure = []
     dates_applied = []
@@ -63,7 +70,8 @@ def graph_incorrect(user_id):
     plt.show()
 
 
-def graph_total_questions(user_id):
+def graph_total_questions(firstname,surname):
+    user_id = get_student(firstname,surname)
     dates = []
     total_questions = []
 
@@ -79,4 +87,11 @@ def graph_total_questions(user_id):
     plt.show()
 
 
-graph_total_questions(10)
+def total_score(firstname,surname):
+    user_id = get_student(firstname,surname)
+    sql = "SELECT sum(score) total FROM (select score FROM pure_results WHERE user_id = ? UNION ALL SELECT score FROM applied_results WHERE user_id = ?) t "
+    resp = pd.read_sql_query(sql, db, params=(user_id, user_id,))
+    if resp.empty:
+        return "No Score Attempt"
+    else:
+        return resp

@@ -6,7 +6,7 @@ from tkinter import messagebox
 # this is import the functionailty of the registration from another python file
 from remake_register import register1, register2
 from test_dates import set_test, show_details
-from login_backend import login_in, forgot_password, support_email, back_button
+from login_backend import login_in, forgot_password, support_email, back_button, get_id_student
 from questions_results import make_question, get_question, compare_answers, end_loop
 from creating_graphs import graph_correct, graph_incorrect, graph_total_questions, total_score
 import view_account as va
@@ -49,8 +49,7 @@ class MathsPro(tk.Tk):
                             "answer": tk.StringVar(),
                             "Loop": tk.StringVar(),
                             "Loop_type": tk.StringVar(),
-                            "student_firstname": tk.StringVar(),
-                            "student_surname": tk.StringVar()}
+                            "student_id": tk.IntVar()}
 
         tk.Tk.wm_title(self, "Maths Pro")  # Sets the title of each page to be Maths Pro
         container = tk.Frame(self)  # defined a container for all the frame be kept
@@ -421,7 +420,7 @@ class StudentArea(tk.Frame):
 
     def score_label(self):
         self.controller.update_widgets([MathsInfo], "score_result", total_score(
-            self.controller.shared_data["login_username"]))
+            self.controller.shared_data["student_id"]))
 
 
 class TeacherArea(tk.Frame):
@@ -837,34 +836,35 @@ class StudentandClass(tk.Frame):
         label.grid(row=0, column=0)
 
         order_age = tk.Button(self, text="Order by Age",
-                              command=lambda: students.config(values=sc.sort_age()))
+                              command=lambda: self.students.config(values=sc.sort_age()))
         order_age.config(height=3, width=15, bg="blue", fg="white")
         order_age.place(x=100, y=200)
 
         order_class = tk.Button(self, text="Order by Class",
-                                command=lambda: students.config(values=sc.sort_class()))
+                                command=lambda: self.students.config(values=sc.sort_class()))
         order_class.config(height=3, width=15, bg="blue", fg="white")
         order_class.place(x=300, y=200)
 
         order_surname = tk.Button(self, text="Order by Surname",
-                                  command=lambda: students.config(values=sc.sort_surname()))
+                                  command=lambda: self.students.config(values=sc.sort_surname()))
         order_surname.config(height=3, width=15, bg="blue", fg="white")
         order_surname.place(x=500, y=200)
 
         order_gender = tk.Button(self, text="Order by Gender",
-                                 command=lambda: students.config(values=sc.sort_gender()))
+                                 command=lambda: self.students.config(values=sc.sort_gender()))
         order_gender.config(height=3, width=15, bg="blue", fg="white")
         order_gender.place(x=700, y=200)
 
+        self.student = tk.StringVar()
         self.students = ttk.Combobox(self, values=sc.get_students(),
-                                     state="readonly")
+                                     state="readonly", textvariable=self.student)
         self.students.set("Please select a student")
         self.students.config(height=5, width=50)
         self.students.place(x=400, y=300)
         self.students.bind("<<ComboboxSelected>>", self.student_find)
 
         back_button = tk.Button(self, text="Back",
-                                command=lambda: [controller.show_frame(TeacherArea), students.set("Please select student ")])
+                                command=lambda: [controller.show_frame(TeacherArea), self.students.set("Please select student")])
         back_button.config(height=3, width=10, bg="blue", fg="white")
         back_button.place(x=1050, y=750)
 
@@ -872,11 +872,13 @@ class StudentandClass(tk.Frame):
         quit_button.config(height=3, width=10, bg="blue", fg="white")
         quit_button.place(x=1200, y=750)
 
-    def student_find(self, event, controller):
-        print(self.students.get())
-        self.controller.shared_data["student_firstname"] = self.students.get()[1]
-        self.controler.shared_data["student_surname"] = self.students.get()[2]
-        controller.show_frame(MathsInfo)
+    def student_find(self, event):
+        print(self.student.get()[0])
+        self.controller.shared_data["student_id"] = self.students.get()[0]
+
+        self.controller.update_widgets([MathsInfo], "score_result", "text", total_score(
+            self.controller.shared_data["student_id"]))
+        self.controller.show_frame(MathsInfo)
 
 
 class Add_Question(tk.Frame):
@@ -1023,31 +1025,31 @@ class MathsInfo(tk.Frame):
         title_label.grid(row=0, column=0)
 
         correct_results = tk.Button(self, text="Display Correct Results", command=lambda: graph_correct(
-            self.controller.shared_data["student_firstname"], self.contrller.shared_data["student_surname"]))
+            self.controller.shared_data["student_id"])
         correct_results.config(height=3, width=15, bg="blue", fg="white")
         correct_results.place(x=100, y=200)
 
-        incorrect_results = tk.Button(self, text="Display Incorrect Results", command=lambda: graph_incorrect(
-            self.controller.shared_data["student_firstname"], self.contrller.shared_data["student_surname"]))
+        incorrect_results=tk.Button(self, text="Display Incorrect Results", command=lambda: graph_incorrect(
+            self.controller.shared_data["student_id"])
         incorrect_results.config(height=3, width=15, bg="blue", fg="white")
         incorrect_results.place(x=300, y=200)
 
-        total_results = tk.Button(self, text="Display Total Questions Results", command=lambda: graph_total_questions(
-            self.controller.shared_data["student_firstname"], self.contrller.shared_data["student_surname"]))
+        total_results=tk.Button(self, text="Display Total Questions Results", command=lambda: graph_total_questions(
+            self.controller.shared_data["student_id"])
         total_results.config(height=3, width=15, bg="blue", fg="white")
         total_results.place(x=500, y=200)
 
-        score_label = tk.Label(self, text="Score", bg="grey")
+        score_label=tk.Label(self, text="Score", bg="grey")
         score_label.place(x=300, y=500)
-        self.score_result = tk.Label(self, text="", bg="grey", font=medium_font)
+        self.score_result=tk.Label(self, text="", bg="grey", font=medium_font)
         self.score_result.place(x=300, y=600)
 
-        back_button = tk.Button(self, text="Back",
+        back_button=tk.Button(self, text="Back",
                                 command=lambda: self.changing_frame(controller, self.controller.shared_data["School"]))
         back_button.config(height=3, width=10, bg="blue", fg="white")
         back_button.place(x=1050, y=750)
 
-        quit_button = tk.Button(self, text="Exit", command=lambda: quit(self))
+        quit_button=tk.Button(self, text="Exit", command=lambda: quit(self))
         quit_button.config(height=3, width=10, bg="blue", fg="white")
         quit_button.place(x=1200, y=750)
 
@@ -1058,7 +1060,7 @@ class MathsInfo(tk.Frame):
             controller.show_frame(TeacherArea)
 
 
-root = MathsPro()  # this runs the Maths Pro class
+root=MathsPro()  # this runs the Maths Pro class
 root.geometry("1280x800+150-50")  # changes the size of the window
 root.resizable(width=False, height=False)  # Prevents the root size from being changed
 root.mainloop()  # As MathsPro inherited from tkinter this function can be moved

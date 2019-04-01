@@ -7,6 +7,12 @@ from remake_register import password_check
 from create_connection import cursor, cursor1, db
 
 
+def get_id_student(username):
+    sql = "SELECT ID FROM Students WHERE = ?"
+    cursor.execute(sql, [(username)])
+    return cursor.fetchone[0]
+
+
 def back_button(school):
     if school is "Student":
         return "S"

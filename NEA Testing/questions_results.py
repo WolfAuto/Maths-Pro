@@ -6,8 +6,8 @@ import random
 from create_connection import cursor, cursor1, db
 
 current_date = dt.date.today().strftime("%Y-%m-%d")
-create_pure_table = """CREATE TABLE IF NOT EXISTS pure_results(maths_id INTEGER PRIMARY KEY, user_id INTEGER, level TEXT , score INTEGER ,total_questions INTEGER, correct_pure INTEGER, incorrect_pure INTEGER,  time_stamp DATE, FOREIGN KEY (user_id) REFERENCES Students(ID))"""
-create_applied_table = """CREATE TABLE IF NOT EXISTS applied_results(maths_id INTEGER PRIMARY KEY, user_id INTEGER, level TEXT , score INTEGER ,total_questions INTEGER,  correct_applied INTEGER, incorrect_applied INTEGER, time_stamp DATE,FOREIGN KEY (user_id) REFERENCES Students(ID))"""
+create_pure_table = """CREATE TABLE IF NOT EXISTS pure_results(maths_id INTEGER PRIMARY KEY, user_id INTEGER, level TEXT , score INTEGER ,total_questions INTEGER, Correct INTEGER, Incorrect INTEGER,  time_stamp DATE, FOREIGN KEY (user_id) REFERENCES Students(ID))"""
+create_applied_table = """CREATE TABLE IF NOT EXISTS applied_results(maths_id INTEGER PRIMARY KEY, user_id INTEGER, level TEXT , score INTEGER ,total_questions INTEGER,  Correct INTEGER, Incorrect INTEGER, time_stamp DATE,FOREIGN KEY (user_id) REFERENCES Students(ID))"""
 cursor.execute(create_pure_table)
 cursor.execute(create_applied_table)
 create_question_table = """CREATE TABLE IF NOT EXISTS maths_questions(question_id INTEGER PRIMARY KEY, test_type TEXT,test_level TEXT, question TEXT, answer TEXT) """

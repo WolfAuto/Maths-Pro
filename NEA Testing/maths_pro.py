@@ -881,7 +881,6 @@ class StudentandClass(tk.Frame):
         self.controller.show_frame(MathsInfo)
 
 
-
 class Add_Question(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -1030,27 +1029,27 @@ class MathsInfo(tk.Frame):
         correct_results.config(height=3, width=15, bg="blue", fg="white")
         correct_results.place(x=100, y=200)
 
-        incorrect_results=tk.Button(self, text="Display Incorrect Results", command=lambda: graph_incorrect(
+        incorrect_results = tk.Button(self, text="Display Incorrect Results", command=lambda: graph_incorrect(
             self.controller.shared_data["student_id"]))
         incorrect_results.config(height=3, width=15, bg="blue", fg="white")
         incorrect_results.place(x=300, y=200)
 
-        total_results=tk.Button(self, text="Display Total Questions Results", command=lambda: graph_total_questions(
+        total_results = tk.Button(self, text="Display Total Questions Results", command=lambda: graph_total_questions(
             self.controller.shared_data["student_id"]))
         total_results.config(height=3, width=15, bg="blue", fg="white")
         total_results.place(x=500, y=200)
 
-        score_label=tk.Label(self, text="Score", bg="grey")
+        score_label = tk.Label(self, text="Score", bg="grey")
         score_label.place(x=300, y=500)
-        self.score_result=tk.Label(self, text="", bg="grey", font=medium_font)
+        self.score_result = tk.Label(self, text="", bg="grey", font=medium_font)
         self.score_result.place(x=300, y=600)
 
-        back_button=tk.Button(self, text="Back",
+        back_button = tk.Button(self, text="Back",
                                 command=lambda: self.changing_frame(controller, self.controller.shared_data["School"]))
         back_button.config(height=3, width=10, bg="blue", fg="white")
         back_button.place(x=1050, y=750)
 
-        quit_button=tk.Button(self, text="Exit", command=lambda: quit(self))
+        quit_button = tk.Button(self, text="Exit", command=lambda: quit(self))
         quit_button.config(height=3, width=10, bg="blue", fg="white")
         quit_button.place(x=1200, y=750)
 
@@ -1061,7 +1060,7 @@ class MathsInfo(tk.Frame):
             controller.show_frame(TeacherArea)
 
 
-root=MathsPro()  # this runs the Maths Pro class
+root = MathsPro()  # this runs the Maths Pro class
 root.geometry("1280x800+150-50")  # changes the size of the window
 root.resizable(width=False, height=False)  # Prevents the root size from being changed
 root.mainloop()  # As MathsPro inherited from tkinter this function can be moved

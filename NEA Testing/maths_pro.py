@@ -873,12 +873,13 @@ class StudentandClass(tk.Frame):
         quit_button.place(x=1200, y=750)
 
     def student_find(self, event):
-        print(self.student.get()[0])
-        self.controller.shared_data["student_id"] = self.students.get()[0]
+        print(self.student.get()[0:2])
+        self.controller.shared_data["student_id"] = self.student.get()[0:2]
 
         self.controller.update_widgets([MathsInfo], "score_result", "text", total_score(
             self.controller.shared_data["student_id"]))
         self.controller.show_frame(MathsInfo)
+
 
 
 class Add_Question(tk.Frame):
@@ -1025,17 +1026,17 @@ class MathsInfo(tk.Frame):
         title_label.grid(row=0, column=0)
 
         correct_results = tk.Button(self, text="Display Correct Results", command=lambda: graph_correct(
-            self.controller.shared_data["student_id"])
+            self.controller.shared_data["student_id"]))
         correct_results.config(height=3, width=15, bg="blue", fg="white")
         correct_results.place(x=100, y=200)
 
         incorrect_results=tk.Button(self, text="Display Incorrect Results", command=lambda: graph_incorrect(
-            self.controller.shared_data["student_id"])
+            self.controller.shared_data["student_id"]))
         incorrect_results.config(height=3, width=15, bg="blue", fg="white")
         incorrect_results.place(x=300, y=200)
 
         total_results=tk.Button(self, text="Display Total Questions Results", command=lambda: graph_total_questions(
-            self.controller.shared_data["student_id"])
+            self.controller.shared_data["student_id"]))
         total_results.config(height=3, width=15, bg="blue", fg="white")
         total_results.place(x=500, y=200)
 

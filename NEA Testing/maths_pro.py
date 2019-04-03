@@ -9,6 +9,7 @@ from test_dates import set_test, show_details
 from login_backend import login_in, forgot_password, support_email, back_button, get_id_student
 from questions_results import make_question, get_question, compare_answers, end_loop
 from creating_graphs import graph_correct, graph_incorrect, graph_total_questions, total_score
+
 import view_account as va
 import student_class as sc
 
@@ -182,7 +183,7 @@ class Register(tk.Frame):  # Creating a class that inheirts tk.Frame from tkinte
         separator.grid(row=1, column=10, rowspan=7, sticky="ns")
         # Label giving instructions on what to do
         intro = (
-            """Registration Page please enter your personal details\nand press the button to confirm your details please enter a captial letter for your frstname and surname""")
+            """Registration Page please enter your personal details\nandpress the button to confirm your details please enter a captial letter for your frstname and surname""")
         intro_label = tk.Label(
             self, text=intro, font=small_font, bg="grey")
         intro_label.grid(row=3, column=11)
@@ -242,7 +243,6 @@ class Register(tk.Frame):  # Creating a class that inheirts tk.Frame from tkinte
             row=6, column=1)  # Option for the user either value 1 (student) and the variable it is stored in
         tk.Radiobutton(self, text="Teacher", padx=20, variable=self.controller.shared_data["var1"], value=2, bg="grey").grid(
             row=6, column=2)  # Option for the user either value 2 (teacher) and the variable it is stored in
-        # Enters all the user information using the register function from the other python file
 
         back_button = tk.Button(self, text="Back",
                                 command=lambda: controller.show_frame(Main_Menu))
@@ -252,6 +252,7 @@ class Register(tk.Frame):  # Creating a class that inheirts tk.Frame from tkinte
         quit_button = tk.Button(self, text="Exit", command=lambda: quit(self))
         quit_button.config(fg="white", bg="blue", height=3, width=10)
         quit_button.place(x=1200, y=750)
+        # Enters all the user information using the register function from the other python file
         enter_details = tk.Button(self, text="Enter details",
                                   command=lambda: self.register(self.controller, self.controller.shared_data["firstname"].get(),
                                                                 self.controller.shared_data["surname"].get(
@@ -343,11 +344,11 @@ class Register2(tk.Frame):
         create_button.config(height=3, width=12, bg="blue", fg="white")
         create_button.grid(row=6, column=2)
 
-    def register(self, controller, username, password, password_confirm, email, var1):
-        if register2(username, password, password_confirm, email, var1) is True:
-            controller.show_frame(Main_Menu)
+    def register(self, controller, username, password, password_confirm, email, var1): #function that calls the register function in the backend
+        if register2(username, password, password_confirm, email, var1) is True: # if register2 has been fully completed
+            controller.show_frame(Main_Menu) # shows the Main_Menu page
             messagebox.showinfo(
-                "Account Creation", "Account creation has been successful an email has been sent to you")
+                "Account Creation", "Account creation has been successful an email has been sent to you") # displays a tkinter info message
 
 
 class StudentArea(tk.Frame):

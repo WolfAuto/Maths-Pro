@@ -37,7 +37,6 @@ def graph_correct_applied(user_id):
     plt.legend()
 
 
-    
 def graph_incorrect_pure(user_id):
     dates_pure = []
     incorrect_pure = []
@@ -56,7 +55,7 @@ def graph_incorrect_pure(user_id):
     plt.show()
 
 
-def graph_incorrect_applied(user_id): 
+def graph_incorrect_applied(user_id):
     dates_applied = []
     incorrect_applied = []
     sql_applied = "SELECT time_stamp, SUM(Incorrect) FROM applied_results WHERE user_id = ? GROUP BY time_stamp"
@@ -69,6 +68,7 @@ def graph_incorrect_applied(user_id):
     plt.ylabel("Incorrect Questions")
     plt.title("Applied Maths Incorrect Progress")
     plt.show()
+
 
 def total_graph_correct(user_id):
     dates = []
@@ -85,10 +85,12 @@ def total_graph_correct(user_id):
     plt.ylabel("Questions Correct")
     plt.title("A Level Maths Total Correct Progress")
     plt.show()
+
+
 def total_graph_incorrect(user_id):
     dates = []
     incorrect = []
-    sql= "SELECT time_stamp,SUM(Incorrect) total FROM (SELECT time_stamp,Incorrect FROM pure_results WHERE user_id = ? UNION ALL SELECT time_stamp, Incorrect FROM applied_results WHERE user_id = ?) t GROUP BY time_stamp"
+    sql = "SELECT time_stamp,SUM(Incorrect) total FROM (SELECT time_stamp,Incorrect FROM pure_results WHERE user_id = ? UNION ALL SELECT time_stamp, Incorrect FROM applied_results WHERE user_id = ?) t GROUP BY time_stamp"
     cursor.execute(sql, [(user_id), (user_id)])
     for a in cursor.fetchall():
         dates.append(a[0])
@@ -98,8 +100,8 @@ def total_graph_incorrect(user_id):
     plt.ylabel("Incorrect Questions")
     plt.title("A Level Maths Total Incorrect Progress")
     plt.show()
-        
-    
+
+
 def graph_total_questions(user_id):
     dates = []
     total_questions = []

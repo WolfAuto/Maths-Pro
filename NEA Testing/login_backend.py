@@ -13,7 +13,8 @@ def get_id_student(username):
     return cursor.fetchone[0]
 
 
-def back_button(school): # This is used for the help Page so that a student or teacher is directed back to the right page
+def back_button(school):
+    # This is used for the help Page so that a student or teacher is directed back to the right page
     if school is "Student": # if student then return S
         return "S"
     elif school is "Teacher": # if teacher then return Y
@@ -59,13 +60,19 @@ def forgot_password(email, new_pass, confirm_pass): # Used to change the user pa
         pass # no error message is needed here as password_check has its own error messages
 
 
-def student_check(username, password): # Used for the login function this checks against the username and password the user enters in students table
-    find_user = ("SELECT username,password FROM Students WHERE username = ?") # sql statement for getting the username and password
-    cursor.execute(find_user, [(username)]) #executes the above sql code
-    checking = cursor.fetchone() # fetchs one of the values
-    if checking is not None: # if there are values in check then it goes through this process
+def student_check(username, password):
+    # Used for the login function this checks against the username and password the user enters in students table
+    find_user = ("SELECT username,password FROM Students WHERE username = ?")
+    # sql statement for getting the username and password
+    cursor.execute(find_user, [(username)])
+    #executes the above sql code
+    checking = cursor.fetchone()
+    # fetchs one of the values
+    if checking is not None:
+        # if there are values in check then it goes through this process
         db_user, db_password = checking # gets username and password stored in the database
-        if (username == db_user) and (bcrypt.checkpw(password.encode("utf8"), db_password) is True): #checks the database username and password against the username and password stored
+        if (username == db_user) and (bcrypt.checkpw(password.encode("utf8"), db_password) is True):
+            #checks the database username and password against the username and password stored
             return True # if condition met return true
     else:
         return False # if condition not met return False

@@ -8,7 +8,7 @@ from remake_register import register1, register2
 from test_dates import set_test, show_details
 from login_backend import login_in, forgot_password, support_email, back_button, get_id_student
 from questions_results import make_question, get_question, compare_answers, end_loop
-from creating_graphs import graph_correct, graph_incorrect, graph_total_questions, total_score
+from creating_graphs import correct_graphs, incorrect_graphs, graph_total_questions, total_score
 
 import view_account as va
 import student_class as sc
@@ -102,6 +102,7 @@ class Main_Menu(tk.Frame):
         self.controller = controller
         title_label = tk.Label(self, text="Maths Pro", bg="blue", fg="white", font=title_font)
         title_label.pack(pady=10, padx=10, fill="x")
+        self.bind("<<ShowFrame>>", self.on_show_frame)
         welcome = (
             "Welcome to Maths Pro please Login in if you alredy have an account or Register if you don't have an account")
         welcome_label = tk.Label(self, text=welcome, font=small_font)
@@ -166,6 +167,9 @@ class Main_Menu(tk.Frame):
             self.controller.shared_data["School"] = "Teacher"
         else:
             messagebox.showwarning("Account", "Account doesn't exist")
+    def on_show_frame(self,event):
+        self.controller.shared_data["login_username"] ="blank"
+        self.controller.shared_data["School"] = "blank"
 
 
 class Register(tk.Frame):  # Creating a class that inheirts tk.Frame from tkinter
@@ -394,6 +398,7 @@ class StudentArea(tk.Frame):
 
         logout_button = tk.Button(self, text="Log out",
                                   command=lambda: controller.show_frame(Main_Menu))
+                                                                                                        
         logout_button.config(height=3, width=10, bg="blue", fg="white")
         logout_button.place(x=1050, y=750)
 

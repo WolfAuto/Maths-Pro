@@ -20,6 +20,8 @@ def graph_correct_pure(user_id):
     plt.ylabel("Questions Correct Pure")
     plt.title("Pure Maths Correct Progress")
     plt.legend()
+
+
 def correct_graphs(user_id):
     dates_pure = []
     correct_pure = []
@@ -44,7 +46,7 @@ def correct_graphs(user_id):
         plt.legend()
         plt.show()
     elif len(dates_applied) > len(dates_pure):
-        plt.plot(dates_applied,correct_applied, label="Applied Progess")
+        plt.plot(dates_applied, correct_applied, label="Applied Progess")
         plt.plot(dates_pure, correct_pure, label="Correct Progess")
         plt.xlabel("Dates of Maths Question Attempted")
         plt.ylabel("Questions Correct")
@@ -85,7 +87,7 @@ def incorrect_graphs(user_id):
         plt.legend()
         plt.show()
     elif len(dates_applied) > len(dates_pure):
-        plt.plot(dates_applied,correct_applied, label="Applied Progess")
+        plt.plot(dates_applied, correct_applied, label="Applied Progess")
         plt.plot(dates_pure, correct_pure, label="Correct Progess")
         plt.xlabel("Dates of Maths Question Attempted")
         plt.ylabel("Questions Incorrect")
@@ -100,7 +102,7 @@ def incorrect_graphs(user_id):
         plt.title("Comparsion of Incorrect Progess")
         plt.legend()
         plt.show()
-incorrect_graphs(10)  
+
 
 def graph_correct_applied(user_id):
     dates_applied = []

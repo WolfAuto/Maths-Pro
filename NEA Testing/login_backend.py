@@ -140,6 +140,6 @@ def support_email(): # Used to send an email to Maths Pro
         return True # after which funciton is completed
     else:
         return messagebox.showerror(
-            "Support", "{Please type in a message in order for it to be sent to support")
+            "Support", "Please type in a message in order for it to be sent to support")
     # error message if text is left none
         support_window.destroy() # gets rid of the window

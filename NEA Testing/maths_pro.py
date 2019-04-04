@@ -86,8 +86,8 @@ class MathsPro(tk.Tk):
 
         frame = self.frames[cont]  # Defines the frame from the chosen frame in the dictionary
         frame.tkraise()  # Brings the frame to the top for the user to see
-        frame.update()
-        frame.event_generate("<<ShowFrame>>")
+        frame.update() # updates what pointer the frame is looking at
+        frame.event_generate("<<ShowFrame>>") # causes an event to occur when a frame is is shown
 
     def update_widgets(self, frame_list, widget_name, criteria, output):
         for i in frame_list:

@@ -77,7 +77,7 @@ class MathsPro(tk.Tk):
         # This allows the frame to be displayed and streched
         frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(StudentandClass)  # sets the first frame to be shown is a register page
+        self.show_frame(Main_Menu)  # sets the first frame to be shown is a register page
 
     def get_page(self, page_class):
         return self.frames[page_class]
@@ -497,12 +497,12 @@ class Help_Page(tk.Frame):
         label.pack(pady=10, padx=10, side="top", anchor="nw")
 
         def toggle():
-            if label_1.invisible:
+            if label_1.invisible: # makes the label disppear if invisible is true
                 label_1.place_forget()
             else:
-                label_1.place(x=300, y=110)
-            label_1.invisible = not(label_1.invisible)
-
+                label_1.place(x=300, y=110) # places the label if invisible is false
+            label_1.invisible = not(label_1.invisible) # reverses the current boolean value of label.insvisible
+            # if true then it becomes false or visa versa 
         def toggle1():
             if label_2.invisible:
                 label_2.place_forget()
@@ -541,7 +541,8 @@ class Help_Page(tk.Frame):
         help_button1.config(fg="white", bg="blue", height=3)
         help_button1.place(x=150, y=105)
         label_1 = tk.Label(
-            self, text="Maths Pro is a revision app around maths \n that allows for continuous revision on A level Maths", bg="cyan", font=small_font)
+            self, text="Maths Pro is a revision app around maths \n that allows for continuous revision on A level Maths"
+            ,bg="cyan", font=small_font)
         label_1.invisible = False
 
         help_button2 = tk.Button(self, text="Questions", command=toggle1)
@@ -782,11 +783,13 @@ class entry_questions(tk.Frame):
         tk.Frame.__init__(self, parent)
         tk.Frame.config(self, bg="grey")
         self.controller = controller
+        self.bind("<<ShowFrame>>",self.on_frame)
 
         label = tk.Label(self, text="Questions", font=title_font, bg="grey")
         label.grid(row=0, column=0)
 
-        intro_text = "Please choose the question loop to occur either a pure question loop aor stats question loop note the questions will have set answers \n and any rounding will be stated in the question"
+        intro_text ="""Please choose the question loop to occur either a pure question
+        loop or applied question loop note the questions will have set answers \n and any rounding will be stated in the question"""
 
         guide = tk.Label(self, text=intro_text, bg="grey")
         guide.grid(row=2, column=4)
@@ -817,7 +820,6 @@ class entry_questions(tk.Frame):
 
     def start_loop(self, controller, type, level):
         if type is 1 or type is 2:
-
             if type is 1:
                 value = "Pure"
                 self.controller.shared_data["Loop"] = "Pure"
@@ -829,7 +831,9 @@ class entry_questions(tk.Frame):
             self.controller.update_widgets([Question_Loop], "question", "text", question_answer[0])
             self.controller.shared_data["answer"] = question_answer[1]
         else:
-            messagebox.showerror("Questions", "Please choose ither Pure or Applied")
+            messagebox.showerror("Questions", "Please choose either Pure or Applied")
+    def on_frame(self,event):
+        print(self.controller.shared_data["test_level"])
 
 
 class StudentandClass(tk.Frame):

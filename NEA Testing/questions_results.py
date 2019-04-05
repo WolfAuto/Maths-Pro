@@ -6,11 +6,17 @@ import random
 from create_connection import cursor, cursor1, db
 
 current_date = dt.date.today().strftime("%Y-%m-%d")
-create_pure_table = """CREATE TABLE IF NOT EXISTS pure_results(maths_id INTEGER PRIMARY KEY, user_id INTEGER, level TEXT , score INTEGER ,total_questions INTEGER, Correct INTEGER, Incorrect INTEGER,  time_stamp DATE, FOREIGN KEY (user_id) REFERENCES Students(ID))"""
-create_applied_table = """CREATE TABLE IF NOT EXISTS applied_results(maths_id INTEGER PRIMARY KEY, user_id INTEGER, level TEXT , score INTEGER ,total_questions INTEGER,  Correct INTEGER, Incorrect INTEGER, time_stamp DATE,FOREIGN KEY (user_id) REFERENCES Students(ID))"""
+create_pure_table = """CREATE TABLE IF NOT EXISTS pure_results
+(maths_id INTEGER PRIMARY KEY, user_id INTEGER, level TEXT , score INTEGER ,
+total_questions INTEGER, Correct INTEGER, Incorrect INTEGER,  time_stamp DATE,
+FOREIGN KEY (user_id) REFERENCES Students(ID))"""
+create_applied_table = """CREATE TABLE IF NOT EXISTS applied_results
+(maths_id INTEGER PRIMARY KEY, user_id INTEGER, level TEXT , score INTEGER ,total_questions INTEGER,
+Correct INTEGER, Incorrect INTEGER, time_stamp DATE,FOREIGN KEY (user_id) REFERENCES Students(ID))"""
 cursor.execute(create_pure_table)
 cursor.execute(create_applied_table)
-create_question_table = """CREATE TABLE IF NOT EXISTS maths_questions(question_id INTEGER PRIMARY KEY, test_type TEXT,test_level TEXT, question TEXT, answer TEXT) """
+create_question_table = """CREATE TABLE IF NOT EXISTS
+maths_questions(question_id INTEGER PRIMARY KEY, test_type TEXT,test_level TEXT, question TEXT, answer TEXT) """
 cursor.execute(create_question_table)
 db.commit()
 
@@ -86,30 +92,24 @@ def make_question(question_text, type, level, answer):
 
 
 def random_num(total):
-    data = random.sample(range(total), 1)
-    running = True
-
-    while running:
-        data = random.sample(range(total), 1)
-        if (data[0] in question_store) is False:
-            question_store.append(data[0])
-            return data[0]
-        elif (len(question_store)) is total:
-            return "stop"
-        else:
-            pass
+    while len(question_store) is not total: # loop for running
+        data = random.randint(0, total-1) #creates a random number between 1 and total
+        if (data in question_store) is False: # if number is not in the list then
+            question_store.append(data) # append to list
+            return data # return the value received
+    return "stop"
 
 
-def get_question(type, level):
-    query = "SELECT question,answer FROM maths_questions WHERE test_type = ? AND test_level = ?"
-    resp = pd.read_sql_query(query, db, params=[(type), (level)])
-
+def get_question(type, level): # takes in params type and level
+    query = "SELECT question,answer FROM maths_questions WHERE test_type = ? AND test_level = ?" # sql query
+    resp = pd.read_sql_query(query, db, params=[(type), (level)]) # converts sql query into a pandas dataframe
     query1 = "SELECT COUNT(question_id) FROM maths_questions WHERE test_type=? AND test_level=?"
-    cursor1.execute(query1, [(type), (level)])
-    total = cursor1.fetchone()[0]
-    rand_num = random_num(total)
-    if rand_num is not "stop":
-        return [resp["question"][rand_num], resp["Answer"][rand_num]]
+    # gets total amount of questions for the specific type and level (amount of records that met the requirements)
+    cursor1.execute(query1, [(type), (level)]) # calculates the value of above query
+    total = cursor1.fetchone()[0] # stores the value to a variable total
+    rand_num = random_num(total) # runs the function to generate a non-duplicate random number
+    if rand_num is not "stop": # continues until rand_num is stop
+        return [resp["question"][rand_num], resp["Answer"][rand_num]] # returns the question and answer 
     else:
         return ["No more Questions", "END"]
 

@@ -114,46 +114,50 @@ def get_question(type, level): # takes in params type and level
         return ["No more Questions", "END"]
 
 
-def compare_answers(user_input, actual_answer):
-    if user_input.find(",") is not -1:
-        mylist = user_input.split(",")
-        mylist.sort(key=int)
-        user_input = ",".join(mylist)
-        if str(user_input) == str(actual_answer):
-            return True
+def compare_answers(user_input, actual_answer): # takes in user input an actual answer
+    if user_input.find(",") is not -1: # looks for , between answers
+        mylist = user_input.split(",") # creates a list by spliting the valeues using commas
+        mylist.sort(key=int) # sorts the list in numerical order
+        user_input = ",".join(mylist) # creates the string back by joining the values using a comma from the list
+        if str(user_input) == str(actual_answer): # compares the two strings
+            return True # if same then true
         else:
-            return False
-    else:
-        if str(user_input) == str(actual_answer):
-            return True
+            return False # if not the same then false
+    else: # done if the answer is separated by commas
+        if str(user_input) == str(actual_answer): # compare strings
+            return True # if same then true
         else:
-            return False
+            return False # if not then same then false
 
 
-def get_student(username):
+def get_student(username): # uses a parameter username
     sql = "SELECT ID FROM Students WHERE username = ? "
-    cursor.execute(sql, [(username)])
-    return cursor.fetchone()[0]
+    # sql for searching for the ID connected to the username
+    cursor.execute(sql, [(username)]) # execution of search for ID 
+    return cursor.fetchone()[0] # returns the value of the id
 
 
 def end_loop(loop, user, correct, incorrect, score, level, total):
-    if total == 0:
+    if total == 0: # no questions attempted
         return False
     else:
-        store_id = get_student(user)
+        store_id = get_student(user) # gets the user id using get_student
         total = len(question_store)
-        if loop is "Pure":
-            sql = "INSERT INTO pure_results (user_id,level, score, correct_pure, incorrect_pure,total_questions, time_stamp) VALUES (?, ?, ?, ?, ?, ?,?) "
+        # gets the len of question store for total questions attempted
+        if loop is "Pure": # if loop is pure
+            sql = """INSERT INTO pure_results (user_id,level, score, Correct, Incorrect,total_questions, time_stamp)
+VALUES (?, ?, ?, ?, ?, ?,?) """ # sql for inserting a record into pure_results table
             cursor.execute(sql, [(store_id), (level), (score), (correct),
-                                 (incorrect), (total), (current_date)])
-            db.commit()
-            question_store.clear()
+                                 (incorrect), (total), (current_date)]) # executes the statment with python variales 
+            db.commit() # saves changes made to database file
+            question_store.clear() # removes all the values in question_store
             return True
 
-        elif loop is "Applied":
-            sql = "INSERT INTO applied_results (user_id,level, score, correct_applied, incorrect_applied,total_questions, time_stamp) VALUES (?, ?, ?, ?, ?, ?,?) "
+        elif loop is "Applied": # if loop is applied
+            sql = """INSERT INTO applied_results (user_id,level, score, Correct, Incorrect,total_questions, time_stamp)
+VALUES (?, ?, ?, ?, ?, ?,?) """ # sql for inserting a record into applied_results table
             cursor.execute(sql, [(store_id), (level), (score), (correct),
-                                 (incorrect), (total), (current_date)])
-            db.commit()
-            question_store.clear()
+                                 (incorrect), (total), (current_date)]) # executes the statment with python variales 
+            db.commit() # saves changes made to database file
+            question_store.clear() # removes all the values in question_store
             return True

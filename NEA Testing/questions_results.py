@@ -93,7 +93,7 @@ def make_question(question_text, type, level, answer):
 
 def random_num(total):
     while len(question_store) is not total: # loop for running
-        data = random.randint(0, total-1) #creates a random number between 1 and total
+        data = random.randint(0, total) #creates a random number between 1 and total
         if (data in question_store) is False: # if number is not in the list then
             question_store.append(data) # append to list
             return data # return the value received

@@ -783,7 +783,6 @@ class entry_questions(tk.Frame):
         tk.Frame.__init__(self, parent)
         tk.Frame.config(self, bg="grey")
         self.controller = controller
-        self.bind("<<ShowFrame>>",self.on_frame)
 
         label = tk.Label(self, text="Questions", font=title_font, bg="grey")
         label.grid(row=0, column=0)
@@ -804,8 +803,8 @@ class entry_questions(tk.Frame):
                        variable=self.controller.shared_data["test_type"], value=1, bg="grey").grid(row=2, column=1)
         tk.Radiobutton(self, text="Applied", padx=5,
                        variable=self.controller.shared_data["test_type"], value=2, bg="grey").grid(row=2, column=2)
-        start_button = tk.Button(self, text="Start", bg="grey", command=lambda: [self.start_loop(
-            self.controller, self.controller.shared_data["test_type"].get(), self.controller.shared_data["test_level"]), controller.show_frame(Question_Loop)])
+        start_button = tk.Button(self, text="Start", bg="grey", command=lambda: self.start_loop(
+            self.controller, self.controller.shared_data["test_type"].get(), self.controller.shared_data["test_level"]))
         start_button.config(bg="blue", fg="white", height=3, width=10)
         start_button.grid(row=3, column=2)
 
@@ -830,10 +829,10 @@ class entry_questions(tk.Frame):
             question_answer = get_question(value, level)
             self.controller.update_widgets([Question_Loop], "question", "text", question_answer[0])
             self.controller.shared_data["answer"] = question_answer[1]
+            self.controller.show_frame(Question_Loop)
         else:
             messagebox.showerror("Questions", "Please choose either Pure or Applied")
-    def on_frame(self,event):
-        print(self.controller.shared_data["test_level"])
+
 
 
 class StudentandClass(tk.Frame):
@@ -994,36 +993,63 @@ class Question_Loop(tk.Frame):
             messagebox.showinfo("Results", "End of Questions Result are correct: %s, incorrect: %s, score: %s, total: %s" % (
                 self.correct, self.incorrect, self.quizScore, self.total))
             self.total = 0
+            self.correct = 0
+            self.quizScore=0
+            self.incorrect =0
+            
             controller.show_frame(StudentArea)
         elif end_loop(loop, user, correct, incorrect, score, level, total) is False:
             messagebox.showinfo("Questions", "No Questions attempted")
             controller.show_frame(StudentArea)
 
-    def confirm_answer(self, controller, user_answer, actual_answer):
+    def confirm_answer(self,controller, user_answer, actual_answer):
         if compare_answers(user_answer, actual_answer) is True:
             messagebox.showinfo("Answer", "That is the correct answer")
             self.total = self.total + 1
-            self.correct = self.correct+1
-            self.quizScore = self.quizScore+5
+            self.correct = self.correct + 1
+            self.quizScore = self.quizScore + 5
+            question_answer = get_question(self.controller.shared_data["Loop_type"],
+                                       self.controller.shared_data["test_level"])
+            self.question["text"] = question_answer[0]
+            if question_answer[1] == "END":
+                end_loop(self.controller.shared_data["Loop"],
+                         self.controller.shared_data["login_username"],
+                         self.correct,self.incorrect,self.quizScore,
+                         self.controller.shared_data["test_level"],self.total)
+                messagebox.showinfo("Results", """End of questions (no more questions)
+                Results are correct:%s, incorrect:%s, score:%s, total:%s""" % (
+                                   self.correct, self.incorrect, self.quizScore, self.total))
+                self.correct=0
+                self.incorrect=0
+                self.total=0
+                self.quizScore = 0
+                self.controller.show_frame(StudentArea)
+            else:
+                self.controller.shared_data["answer"] = question_answer[1]
+        elif compare_answers(user_answer, actual_answer) is False:
+            messagebox.showinfo("Answer", "That is incorrect answer is %s" %
+                                (self.controller.shared_data["answer"]))
+            self.total = self.total + 1
+            self.incorrect = self.incorrect + 1
+            self.quizScore = self.quizScore - 5
             question_answer = get_question(self.controller.shared_data["Loop_type"],
                                            self.controller.shared_data["test_level"])
             self.question["text"] = question_answer[0]
-            self.controller.shared_data["answer"] = question_answer[1]
-
-        elif compare_answers(user_answer, actual_answer) is False:
-            question_answer = get_question(
-                self.controller.shared_data["Loop_type"], self.controller.shared_data["test_level"])
-            self.question["text"] = question_answer[0]
-            self.controller.shared_data["answer"] = question_answer[1]
-            if self.controller.shared_data["answer"] == "END":
-                messagebox.showinfo(
-                    "Questions", "End of questions press end loop to leave the page")
+            if question_answer[1] == "END":
+                end_loop(self.controller.shared_data["Loop"],
+                         self.controller.shared_data["login_username"],
+                         self.correct,self.incorrect,self.quizScore,
+                         self.controller.shared_data["test_level"],self.total)
+                messagebox.showinfo("Results", """End of questions (no more questions)
+                Results are correct:%s, incorrect:%s, score:%s, total:%s""" % (
+                    self.correct, self.incorrect, self.quizScore, self.total))
+                self.correct=0
+                self.incorrect=0
+                self.total=0
+                self.quizScore = 0
+                self.controller.show_frame(StudentArea)
             else:
-                messagebox.showinfo("Answer", "That is the incorrect answer the answer is %s" %
-                                    (self.controller.shared_data["answer"]))
-                self.total = self.total + 1
-                self.incorrect = self.incorrect + 1
-                self.quizScore = self.quizScore-5
+                self.controller.shared_data["answer"] = question_answer[1]
 
 
 class MathsInfo(tk.Frame):

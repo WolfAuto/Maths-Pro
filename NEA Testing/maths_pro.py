@@ -3,12 +3,13 @@ import tkinter.scrolledtext as tkst
 import re
 from tkinter import ttk
 from tkinter import messagebox
+from matplotlib.pyplot import close as end
 # this is import the functionailty of the registration from another python file
 from remake_register import register1, register2
 from test_dates import set_test, show_details
 from login_backend import login_in, forgot_password, support_email, back_button, get_id_student
 from questions_results import make_question, get_question, compare_answers, end_loop
-from creating_graphs import correct_graphs, incorrect_graphs, graph_total_questions, total_score
+from creating_graphs import total_graph_correct, total_graph_incorrect,graph_total_questions,score_graph,total_score
 
 import view_account as va
 import student_class as sc
@@ -50,7 +51,7 @@ class MathsPro(tk.Tk):
                             "answer": tk.StringVar(),
                             "Loop": tk.StringVar(),
                             "Loop_type": tk.StringVar(),
-                            "student_id": tk.IntVar()}
+                            "student_id": 0}
 
         tk.Tk.wm_title(self, "Maths Pro")  # Sets the title of each page to be Maths Pro
         container = tk.Frame(self)  # defined a container for all the frame be kept
@@ -77,7 +78,7 @@ class MathsPro(tk.Tk):
         # This allows the frame to be displayed and streched
         frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Main_Menu)  # sets the first frame to be shown is a register page
+        self.show_frame(StudentandClass)  # sets the first frame to be shown is a register page
 
     def get_page(self, page_class):
         return self.frames[page_class]
@@ -161,6 +162,8 @@ class Main_Menu(tk.Frame):
             controller.show_frame(StudentArea)
             self.controller.shared_data["login_username"] = username
             self.controller.shared_data["School"] = "Student"
+            self.controller.shared_data["student_id"] = get_id_student(username)
+            print(self.controller.shared_data["student_id"])
         elif login_in(username, password) == "T":
             controller.show_frame(TeacherArea)
             self.controller.shared_data["login_username"] = username
@@ -369,8 +372,8 @@ class StudentArea(tk.Frame):
             self, text="Welcome Student please choose from the following", font=medium_font, bg="grey")
         info_text.place(x=350, y=100)
         account_button = tk.Button(self, text="View Account Infomation",
-                                   command=lambda: [self.update_labels(), controller.show_frame(ViewAccountInfo),
-                                                    ])
+                                   command=lambda: [self.update_labels(),
+                                                    controller.show_frame(ViewAccountInfo)])
         account_button.config(height=5, width=30, bg="blue", fg="white")
         account_button.place(x=400, y=450)
 
@@ -425,7 +428,7 @@ class StudentArea(tk.Frame):
         self.controller.shared_data["test_level"] = "A2"
 
     def score_label(self):
-        self.controller.update_widgets([MathsInfo], "score_result", total_score(
+        self.controller.update_widgets([MathsInfo], "score_result","text",total_score(
             self.controller.shared_data["student_id"]))
 
 
@@ -717,7 +720,8 @@ class SetTestDate(tk.Frame):
         separator = ttk.Separator(self, orient="vertical")
         separator.grid(row=1, column=3, rowspan=7, sticky="ns")
         # instruction text for username and password
-        guide = ("Enter test date, test type, test level and any other comments that you would like to add. \n Note: Date format should be YYYY-MM-DD, leaving a comment is optional")
+        guide = ("""Enter test date, test type, test level and any other comments that you would like to add.
+\n Note: Date format should be YYYY-MM-DD, leaving a comment is optional""")
         label_text = tk.Label(self, text=guide, font=small_font, bg="grey")
         label_text.grid(row=2, column=4)
 
@@ -766,8 +770,7 @@ class SetTestDate(tk.Frame):
         back_button.config(height=3, width=10, bg="blue", fg="white")
         back_button.place(x=1050, y=750)
 
-        create_button = tk.Button(self, text="Set Test Date", command=lambda: [self.test_date(
-            controller, self.controller.shared_data["date"].get(), self.controller.shared_data["var_type"].get(), self.controller.shared_data["var_level"].get(), self.controller.shared_data["comments"].get()), test_entry.delete(0, tk.END), comments_entry.delete(0, tk.END)])
+        create_button = tk.Button(self, text="Set Test Date", command=lambda: [self.test_date(controller, self.controller.shared_data["date"].get(), self.controller.shared_data["var_type"].get(),self.controller.shared_data["var_level"].get(), self.controller.shared_data["comments"].get()),test_entry.delete(0, tk.END),comments_entry.delete(0, tk.END)])
         create_button.config(bg="blue", fg="white", height=3, width=10)
 
         create_button.grid(row=5, column=2)
@@ -873,7 +876,8 @@ class StudentandClass(tk.Frame):
         self.students.bind("<<ComboboxSelected>>", self.student_find)
 
         back_button = tk.Button(self, text="Back",
-                                command=lambda: [controller.show_frame(TeacherArea), self.students.set("Please select student")])
+                                command=lambda: [controller.show_frame(TeacherArea),
+                                                 self.students.set("Please select student")])
         back_button.config(height=3, width=10, bg="blue", fg="white")
         back_button.place(x=1050, y=750)
 
@@ -883,6 +887,7 @@ class StudentandClass(tk.Frame):
 
     def student_find(self, event):
         print(self.student.get()[0:2])
+        print(self.student.get()[0][0])
         self.controller.shared_data["student_id"] = self.student.get()[0:2]
 
         self.controller.update_widgets([MathsInfo], "score_result", "text", total_score(
@@ -930,7 +935,7 @@ class Add_Question(tk.Frame):
         separator = ttk.Separator(self, orient="vertical")
         separator.grid(row=1, column=3, rowspan=7, sticky="ns")
 
-        guide = "This allows you to create new questions for students the questions must have set answers \n and if the questions have more than one answer then separate using commas \n and if there is more than one anwser then the order of the answers must be given in the question "
+        guide = """This allows you to create new questions for students the questions must have set answers \n and if the questions have more than one answer then separate using commas\n and if there is more than one answerthen separate the answers using commas """
 
         intro_label = tk.Label(self, text=guide, bg="grey", font=("Times New Roman", 10))
         intro_label.grid(row=2, column=4)
@@ -944,8 +949,13 @@ class Add_Question(tk.Frame):
         quit_button.config(height=3, width=10, bg="blue", fg="white")
         quit_button.place(x=1200, y=750)
 
-        add_question = tk.Button(self, text="Add Question", command=lambda: [self.add_question(controller, question_entry.get(
-            "1.0", "end-1c"), self.controller.shared_data["type"].get(), self.controller.shared_data["level"].get(), answer.get()), question_entry.delete("1.0", "end")])
+        add_question = tk.Button(self, text="Add Question", command=lambda:
+                                 [self.add_question(controller,
+                                    question_entry.get("1.0", "end-1c"),
+                                    self.controller.shared_data["type"].get(),
+                                    self.controller.shared_data["level"].get(),
+                                    answer.get()),
+                                    question_entry.delete("1.0", "end")])
         add_question.config(bg="blue", fg="white", height=3, width=10)
         add_question.grid(row=5, column=2)
 
@@ -1060,25 +1070,29 @@ class MathsInfo(tk.Frame):
         title_label = tk.Label(self, text="Maths Info", font=title_font, bg="grey")
         title_label.grid(row=0, column=0)
 
-        correct_results = tk.Button(self, text="Display Correct Results", command=lambda: graph_correct(
-            self.controller.shared_data["student_id"]))
-        correct_results.config(height=3, width=15, bg="blue", fg="white")
-        correct_results.place(x=100, y=200)
+        total_correct_results = tk.Button(self, text="Total Correct Graph", command=lambda: [end(),total_graph_correct(
+            self.controller.shared_data["student_id"])])
+        total_correct_results.config(height=5, width=20, bg="blue", fg="white")
+        total_correct_results.place(x=200, y=200)
 
-        incorrect_results = tk.Button(self, text="Display Incorrect Results", command=lambda: graph_incorrect(
-            self.controller.shared_data["student_id"]))
-        incorrect_results.config(height=3, width=15, bg="blue", fg="white")
-        incorrect_results.place(x=300, y=200)
+        total_incorrect_results = tk.Button(self, text="Total Incorrect Graph", command=lambda: [end(),total_graph_incorrect( self.controller.shared_data["student_id"])])
+        total_incorrect_results.config(height=5, width=20, bg="blue", fg="white")
+        total_incorrect_results.place(x=850, y=200)
 
-        total_results = tk.Button(self, text="Display Total Questions Results", command=lambda: graph_total_questions(
-            self.controller.shared_data["student_id"]))
-        total_results.config(height=3, width=15, bg="blue", fg="white")
-        total_results.place(x=500, y=200)
+        total_results = tk.Button(self, text="Total Questions Graph", command=lambda: [end(),graph_total_questions(
+            self.controller.shared_data["student_id"])])
+        total_results.config(height=5, width=20, bg="blue", fg="white")
+        total_results.place(x=850, y=400)
 
-        score_label = tk.Label(self, text="Score", bg="grey")
-        score_label.place(x=300, y=500)
-        self.score_result = tk.Label(self, text="", bg="grey", font=medium_font)
-        self.score_result.place(x=300, y=600)
+        total_score = tk.Button(self, text="Total Score Graph", command=lambda: [end(),
+        score_graph(self.controller.shared_data["student_id"])])
+        total_score.config(height=5,width=20,bg="blue", fg="white")
+        total_score.place(x=200, y=400)
+        
+        score_label = tk.Label(self, text="Score:", bg="grey", font=large_font)
+        score_label.place(x=300, y=600)
+        self.score_result = tk.Label(self, text="", bg="grey", font=large_font)
+        self.score_result.place(x=400, y=600)
 
         back_button = tk.Button(self, text="Back",
                                 command=lambda: self.changing_frame(controller, self.controller.shared_data["School"]))

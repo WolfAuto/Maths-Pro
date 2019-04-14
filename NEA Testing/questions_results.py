@@ -2,6 +2,7 @@ import pandas as pd
 from tkinter import messagebox
 import datetime as dt
 import random
+import re
 
 from create_connection import cursor, cursor1, db
 
@@ -26,30 +27,37 @@ question_answers = []
 
 
 def make_question(question_text, type, level, answer):
-    question_type = ""
-    question_level = ""
-    if question_text:
+    answer_string = str(answer)
+    match = re.match("[\w,\s,.]*$",question_text)
+    if match is not None and (len(question_text) >= 50):
         if type is 1:
             question_type = "Pure"
             if level is 1:
-                if answer.isalnum() is True:
+                if answer_string.isalnum() is True:
                     question_level = "AS"
                     insert_question = (
-                        "INSERT INTO maths_questions(test_type, test_level, question,answer) VALUES (?, ?, ?, ?) ")
+                        """INSERT INTO maths_questions(test_type, test_level, question,answer)
+                        VALUES (?, ?, ?, ?) """)
                     cursor.execute(insert_question, [(question_type),
-                                                     (question_level), (question_text), (str(answer))])
+                                                     (question_level),
+                                                     (question_text),
+                                                     (str(answer))])
                     db.commit()
                     return True
                 else:
                     messagebox.showerror(
                         "Answer", "Answer cannot be left blank and no spaces in answer")
             elif level is 2:
-                if answer.isalnum() is True:
+                
+                if answer_string.isalnum() is True:
                     question_level = "A2"
                     insert_question = (
-                        "INSERT INTO maths_questions(test_type, test_level, question, answer) VALUES (?, ?, ?, ?) ")
+                        """INSERT INTO maths_questions(test_type, test_level, question, answer)
+                        VALUES (?, ?, ?, ?) """)
                     cursor.execute(insert_question, [(question_type),
-                                                     (question_level), (question_text), (str(answer))])
+                                                     (question_level),
+                                                     (question_text),
+                                                     (str(answer))])
                     db.commit()
                     return True
                 else:
@@ -60,24 +68,30 @@ def make_question(question_text, type, level, answer):
         elif type is 2:
             question_type = "Applied"
             if level is 1:
-                if answer.isalnum() is True:
+                if answer_string.isalnum() is True:
                     question_level = "AS"
                     insert_question = (
-                        "INSERT INTO maths_questions(test_type, test_level, question, answer) VALUES (?, ?, ?, ?) ")
+                        """INSERT INTO maths_questions(test_type, test_level, question, answer)
+                        VALUES (?, ?, ?, ?) """)
                     cursor.execute(insert_question, [(question_type),
-                                                     (question_level), (question_text), (str(answer))])
+                                                     (question_level),
+                                                     (question_text),
+                                                     (str(answer))])
                     db.commit()
                     return True
                 else:
                     messagebox.showerror(
                         "Answer", "Answer cannot be left blank and no spaces in answer")
             elif level is 2:
-                if answer.isalnum() is True:
+                if answer_string.isalnum() is True:
                     question_level = "A2"
                     insert_question = (
-                        "INSERT INTO maths_questions(test_type, test_level, question, answer) VALUES (?, ?, ?, ?) ")
+                        """INSERT INTO maths_questions(test_type, test_level, question, answer)
+                        VALUES (?, ?, ?, ?) """)
                     cursor.execute(insert_question, [(question_type),
-                                                     (question_level), (question_text), (str(answer))])
+                                                     (question_level),
+                                                     (question_text),
+                                                     (str(answer))])
                     db.commit()
                     return True
                 else:
@@ -88,7 +102,7 @@ def make_question(question_text, type, level, answer):
         else:
             messagebox.showerror("Type", "Type cannot be left blank")
     else:
-        messagebox.showerror("Question", "Question cannot be left blank")
+        messagebox.showerror("Question", "Question cannot be left blank and make a reasonable question")
 
 
 def random_num(total):

@@ -8,9 +8,9 @@ from create_connection import cursor, cursor1, db
 
 
 def get_id_student(username):
-    sql = "SELECT ID FROM Students WHERE = ?"
+    sql = "SELECT ID FROM Students WHERE username = ?"
     cursor.execute(sql, [(username)])
-    return cursor.fetchone[0]
+    return cursor.fetchone()[0]
 
 
 def back_button(school):

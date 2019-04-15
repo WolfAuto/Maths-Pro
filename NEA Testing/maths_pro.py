@@ -9,7 +9,7 @@ from remake_register import register1, register2
 from test_dates import set_test, show_details
 from login_backend import login_in, forgot_password, support_email, back_button, get_id_student
 from questions_results import make_question, get_question, compare_answers, end_loop
-from creating_graphs import total_graph_correct, total_graph_incorrect,graph_total_questions,score_graph,total_score
+from creating_graphs import correct_graphs,incorrect_graphs,total_graph_correct, total_graph_incorrect,graph_total_questions,score_graph,total_score
 
 import view_account as va
 import student_class as sc
@@ -78,7 +78,7 @@ class MathsPro(tk.Tk):
         # This allows the frame to be displayed and streched
         frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(StudentandClass)  # sets the first frame to be shown is a register page
+        self.show_frame(Main_Menu)  # sets the first frame to be shown is a register page
 
     def get_page(self, page_class):
         return self.frames[page_class]
@@ -1073,12 +1073,23 @@ class MathsInfo(tk.Frame):
         title_label = tk.Label(self, text="Maths Info", font=title_font, bg="grey")
         title_label.grid(row=0, column=0)
 
+        correct_results = tk.Button(self, text="Correct Graphs",command= lambda: [end(), correct_graphs(
+            self.controller.shared_data["student_id"])])
+        correct_results.config(height=5, width=20, bg="blue",fg="white")
+        correct_results.place(x=525, y=200)
+
         total_correct_results = tk.Button(self, text="Total Correct Graph", command=lambda: [end(),total_graph_correct(
             self.controller.shared_data["student_id"])])
         total_correct_results.config(height=5, width=20, bg="blue", fg="white")
         total_correct_results.place(x=200, y=200)
 
-        total_incorrect_results = tk.Button(self, text="Total Incorrect Graph", command=lambda: [end(),total_graph_incorrect( self.controller.shared_data["student_id"])])
+        incorrect_results = tk.Button(self, text="Incorrect Graphs",command= lambda: [end(), incorrect_graphs(
+            self.controller.shared_data["student_id"])])
+        incorrect_results.config(height=5, width=20, bg="blue",fg="white")
+        incorrect_results.place(x=525, y=400)
+
+        total_incorrect_results = tk.Button(self, text="Total Incorrect Graph", command=lambda: [end(),total_graph_incorrect(
+            self.controller.shared_data["student_id"])])
         total_incorrect_results.config(height=5, width=20, bg="blue", fg="white")
         total_incorrect_results.place(x=850, y=200)
 
@@ -1112,8 +1123,8 @@ class MathsInfo(tk.Frame):
         elif back_button(school) is "T":
             controller.show_frame(TeacherArea)
 
-
-root = MathsPro()  # this runs the Maths Pro class
-root.geometry("1280x800+150-50")  # changes the size of the window
-root.resizable(width=False, height=False)  # Prevents the root size from being changed
-root.mainloop()  # As MathsPro inherited from tkinter this function can be moved
+if __name__ == "__main__":
+    root = MathsPro()  # this runs the Maths Pro class
+    root.geometry("1280x800+150-50")  # changes the size of the window
+    root.resizable(width=False, height=False)  # Prevents the root size from being changed
+    root.mainloop()  # As MathsPro inherited from tkinter this function can be moved

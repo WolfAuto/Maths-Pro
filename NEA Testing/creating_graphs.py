@@ -9,14 +9,16 @@ plt.style.use(["bmh", "seaborn-talk"])
 def correct_graphs(user_id):
     dates_pure = []
     correct_pure = []
-    sql_pure = "SELECT time_stamp,SUM(Correct) FROM pure_results WHERE user_id = ? GROUP BY time_stamp"
+    sql_pure = """SELECT time_stamp,SUM(Correct) FROM pure_results
+                WHERE user_id = ? GROUP BY time_stamp"""
     cursor.execute(sql_pure, [(user_id)])
     for a in cursor.fetchall():
         dates_pure.append(a[0])
         correct_pure.append(a[1])
     dates_applied = []
     correct_applied = []
-    sql_applied = "SELECT time_stamp, SUM(Correct) FROM applied_results WHERE user_id = ? GROUP BY time_stamp"
+    sql_applied = """SELECT time_stamp, SUM(Correct) FROM applied_results
+                    WHERE user_id = ? GROUP BY time_stamp"""
     cursor.execute(sql_applied, [(user_id)])
     for b in cursor.fetchall():
         dates_applied.append(b[0])
@@ -44,8 +46,10 @@ def incorrect_graphs(user_id):
     incorrect_pure = []
     dates_applied = []
     incorrect_applied = []
-    sql_pure = "SELECT time_stamp,SUM(Incorrect) FROM pure_results WHERE user_id = ? GROUP BY time_stamp"
-    sql_applied = "SELECT time_stamp, SUM(Incorrect) FROM applied_results WHERE user_id = ? GROUP BY time_stamp"
+    sql_pure = """SELECT time_stamp,SUM(Incorrect) FROM pure_results
+                WHERE user_id = ? GROUP BY time_stamp"""
+    sql_applied = """SELECT time_stamp, SUM(Incorrect) FROM applied_results
+                    WHERE user_id = ? GROUP BY time_stamp"""
     cursor.execute(sql_pure, [(user_id)])
     for a in cursor.fetchall():
         dates_pure.append(a[0])
@@ -149,9 +153,11 @@ FROM applied_results WHERE user_id = ?) t GROUP BY time_stamp"""
 
 
 def total_score(user_id):
-    sql = "SELECT SUM(score) total FROM (SELECT score FROM pure_results WHERE user_id = ? UNION ALL SELECT score FROM applied_results WHERE user_id = ?) t "
+    sql = """SELECT SUM(score) total FROM
+(SELECT score FROM pure_results WHERE user_id = ?
+UNION ALL SELECT score FROM applied_results WHERE user_id = ?) t """
     resp = pd.read_sql_query(sql, db, params=[(user_id), (user_id)])
-    if resp.empty:
+    if resp["total"][0] is None:
         return "No Score"
     else:
-        return resp.to_csv(None)
+        return resp.to_csv(None, header = False, index = False)

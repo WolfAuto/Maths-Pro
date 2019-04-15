@@ -67,9 +67,9 @@ def upcoming_test():
     pd.set_option("display.width", 200)
     pd.set_option("display.max_columns", None)
     if resp.empty:
-        return "No Test Today"
+        return "No Test Set for the Future"
     else:
-        return resp.to_csv(None)
+        return resp.to_csv(None, index= False)
 
 
 
@@ -80,9 +80,9 @@ def current_test():
     pd.set_option("display.max_columns", None)
 
     if resp.empty:
-        return "No Test Set for the Future"
+        return "No Test Set for Today"
     else:
-        return resp.to_csv(None)
+        return resp.to_csv(None, index = False)
 
 def update_stamp():
     sql = """ UPDATE test_dates SET time_stamp = ? """

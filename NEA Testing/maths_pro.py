@@ -867,6 +867,10 @@ class StudentandClass(tk.Frame):
         order_gender.config(height=3, width=15, bg="blue", fg="white")
         order_gender.place(x=700, y=200)
 
+        order_forename = tk.Button(self, text="Order by Forename", command = lambda: self.students.config(values=sc.sort_forename()))
+        order_forename.config(height=3,width=15,bg="blue",fg="white")
+        order_forename.place(x=900,y=200)
+
         self.student = tk.StringVar()
         self.students = ttk.Combobox(self, values=sc.get_students(),
                                      state="readonly", textvariable=self.student)
@@ -886,9 +890,8 @@ class StudentandClass(tk.Frame):
         quit_button.place(x=1200, y=750)
 
     def student_find(self, event):
-        print(self.student.get()[0:2])
         print(self.student.get()[0][0])
-        self.controller.shared_data["student_id"] = self.student.get()[0:2]
+        self.controller.shared_data["student_id"] = self.student.get()[0][0]
 
         self.controller.update_widgets([MathsInfo], "score_result", "text", total_score(
             self.controller.shared_data["student_id"]))

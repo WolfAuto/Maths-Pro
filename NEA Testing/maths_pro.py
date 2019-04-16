@@ -78,7 +78,7 @@ class MathsPro(tk.Tk):
         # This allows the frame to be displayed and streched
         frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame(Main_Menu)  # sets the first frame to be shown is a register page
+        self.show_frame(StudentandClass)  # sets the first frame to be shown is a register page
 
     def get_page(self, page_class):
         return self.frames[page_class]
@@ -890,12 +890,13 @@ class StudentandClass(tk.Frame):
         quit_button.place(x=1200, y=750)
 
     def student_find(self, event):
-        print(self.student.get()[0][0])
-        self.controller.shared_data["student_id"] = self.student.get()[0][0]
+        print(self.student.get().split(" ",1)[0])
+        self.controller.shared_data["student_id"] = self.student.get().split(" ",1)[0]
+        print(self.controller.shared_data["student_id"])
 
-        self.controller.update_widgets([MathsInfo], "score_result", "text", total_score(
-            self.controller.shared_data["student_id"]))
-        self.controller.show_frame(MathsInfo)
+#        self.controller.update_widgets([MathsInfo], "score_result", "text", total_score(
+ #           self.controller.shared_data["student_id"]))
+  #      self.controller.show_frame(MathsInfo)
 
 
 class Add_Question(tk.Frame):

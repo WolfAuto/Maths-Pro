@@ -890,13 +890,10 @@ class StudentandClass(tk.Frame):
         quit_button.place(x=1200, y=750)
 
     def student_find(self, event):
-        print(self.student.get().split(" ",1)[0])
-        self.controller.shared_data["student_id"] = self.student.get().split(" ",1)[0]
-        print(self.controller.shared_data["student_id"])
-
-#        self.controller.update_widgets([MathsInfo], "score_result", "text", total_score(
- #           self.controller.shared_data["student_id"]))
-  #      self.controller.show_frame(MathsInfo)
+        self.controller.shared_data["student_id"] = int(self.student.get().split(" ",1)[0])
+        self.controller.update_widgets([MathsInfo], "score_result", "text", total_score(
+           self.controller.shared_data["student_id"]))
+        self.controller.show_frame(MathsInfo)
 
 
 class Add_Question(tk.Frame):

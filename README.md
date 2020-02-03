@@ -12,7 +12,9 @@ Teachers have options of view student/class information, setting test dates, vie
 
 Teachers will be able to view all student information and be able to see a graph of progression of all students as well as any students who have gotten to many questions wrong in which case they will come up as flagged students so that intervention can be put in place to help them.
 
-This is a program development for my computer science controlled assessment feel free to use it to implement in a different way
+This is a program development for my computer science controlled assessment feel free to use it to implement in a different way.
+
+This is a working progress feel free to edit and change the code
 
 
 
